@@ -1,0 +1,125 @@
+.joint-list {
+    flex-direction: column;
+}
+
+.joint-sliders-scroll {
+    max-height: 220px;
+}
+
+.joint-slider-list {
+    flex-direction: column;
+    width: auto;
+    flex-wrap: nowrap;
+}
+
+.action-button {
+    font-size: var(--font-size);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius);
+    padding-top: 6px; padding-bottom: 6px;
+    padding-left: 12px; padding-right: 12px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.action-button:hover {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.button-row .action-button {
+    font-size: var(--font-size-sm);
+    padding-top: 3px; padding-bottom: 3px;
+    padding-left: 8px; padding-right: 8px;
+    flex-grow: 1;
+}
+
+.mode-button {
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius);
+    padding-top: 4px; padding-bottom: 4px;
+    padding-left: 8px; padding-right: 8px;
+    flex-grow: 1;
+    margin: 2px;
+}
+
+.mode-button:hover {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.stop-button {
+    font-size: var(--font-size);
+    color: white;
+    background-color: var(--color-danger);
+    border-width: 0;
+    border-radius: var(--radius);
+    padding: 8px;
+    margin-top: 8px;
+    -unity-font-style: bold;
+}
+
+.stop-button:hover {
+    background-color: rgb(200, 60, 55);
+}
+
+.stop-button:active {
+    background-color: rgb(170, 40, 35);
+}
+
+.button-row {
+    flex-direction: row;
+    margin-top: 4px;
+}
+
+.ee-input-row {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px 0;
+}
+
+.ee-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    width: 18px;
+}
+
+.ee-input {
+    font-size: var(--font-size-sm);
+    width: 60px;
+    margin-right: 4px;
+}
+
+.slider-control {
+    margin: 4px 0;
+}
+
+.status-bar {
+    height: var(--statusbar-height);
+    min-height: var(--statusbar-height);
+    background-color: var(--color-panel);
+    flex-direction: row;
+    align-items: center;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-top-width: 1px;
+    border-top-color: var(--color-border);
+}
+
+.status-message {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    flex-grow: 1;
+}
+
+.status-time {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+}

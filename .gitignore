@@ -1,0 +1,39 @@
+# --- Unity 自动生成（体积巨大的缓存）---
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+
+# --- 构建产物 ---
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+
+# --- 用户个人设置 ---
+[Uu]ser[Ss]ettings/
+
+# --- IDE 自动生成（Unity 会根据 asmdef 重新生成）---
+*.csproj
+*.sln
+*.slnx
+*.pidb
+*.unityproj
+
+# --- 编辑器个人布局 ---
+imgui.ini
+
+# --- Rider ---
+.idea/
+*.sln.DotSettings.user
+
+# --- VS Code（仅保留 extensions.json）---
+.vscode/settings.json
+.vscode/launch.json
+
+# --- 操作系统 ---
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# --- Claude Code 本地配置 ---
+.claude/

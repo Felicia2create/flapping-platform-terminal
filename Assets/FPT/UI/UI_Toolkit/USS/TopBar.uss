@@ -1,0 +1,81 @@
+/* === 顶栏 === */
+.top-bar {
+    height: var(--topbar-height);
+    min-height: var(--topbar-height);
+    background-color: var(--color-panel);
+    flex-direction: row;
+    align-items: center;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+}
+
+/* === 顶栏左/中/右分区 === */
+.top-bar-left {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 0;
+}
+
+.top-bar-center {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.top-bar-right {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 0;
+}
+
+.top-bar-title {
+    font-size: 14px;
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    margin-right: 12px;
+}
+
+.top-bar-device {
+    font-size: var(--font-size);
+    color: var(--color-text);
+}
+
+.top-bar-status {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    margin-left: 6px;
+}
+
+.top-bar-mode {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent2);
+    margin-right: 16px;
+}
+
+.top-bar-fps {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+}
+
+/* === 连接状态指示灯 === */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
+
+.status-dot.connected {
+    background-color: var(--color-accent2);
+}
+
+.status-dot {
+    background-color: var(--color-text-dim);
+}
+
+.status-dot.error {
+    background-color: var(--color-danger);
+}

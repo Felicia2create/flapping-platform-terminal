@@ -1,0 +1,97 @@
+:root {
+    --color-bg: rgb(13, 17, 23);
+    --color-panel: rgb(22, 27, 34);
+    --color-surface: rgb(33, 38, 45);
+    --color-border: rgb(48, 54, 61);
+    --color-accent: rgb(88, 166, 255);
+    --color-accent2: rgb(63, 185, 80);
+    --color-warning: rgb(210, 153, 34);
+    --color-danger: rgb(248, 81, 73);
+    --color-text: rgb(201, 209, 217);
+    --color-text-dim: rgb(139, 148, 158);
+    --font-size-sm: 11px;
+    --font-size: 13px;
+    --font-size-lg: 16px;
+    --radius: 4px;
+    --panel-width: 260px;
+    --topbar-height: 44px;
+    --statusbar-height: 22px;
+}
+
+.root {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+}
+
+.main-area {
+    flex-direction: row;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.left-panel {
+    width: var(--panel-width);
+    background-color: var(--color-panel);
+    border-right-width: 1px;
+    border-right-color: var(--color-border);
+    padding: 8px;
+    overflow: scroll;
+}
+
+.right-panel {
+    width: var(--panel-width);
+    background-color: var(--color-panel);
+    border-left-width: 1px;
+    border-left-color: var(--color-border);
+    padding: 8px;
+    overflow: scroll;
+}
+
+.center-view {
+    flex-grow: 1;
+    background-color: transparent;
+}
+
+.panel-header {
+    font-size: var(--font-size-lg);
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+}
+
+.data-section {
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.control-section {
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.section-title {
+    font-size: var(--font-size);
+    color: var(--color-accent2);
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.data-label {
+    font-size: var(--font-size);
+    color: var(--color-text);
+    margin-left: 8px;
+    padding: 2px 0;
+}
+
+.placeholder-text {
+    font-size: var(--font-size);
+    color: var(--color-text-dim);
+    -unity-font-style: italic;
+    margin-left: 8px;
+    padding: 4px 0;
+}

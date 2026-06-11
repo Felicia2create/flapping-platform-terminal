@@ -1,0 +1,58 @@
+.joint-slider {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2px; margin-bottom: 2px;
+    margin-left: 0; margin-right: 0;
+    padding-top: 2px; padding-bottom: 2px;
+    padding-left: 4px; padding-right: 4px;
+    background-color: var(--color-surface);
+    border-radius: var(--radius);
+}
+
+.joint-name {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
+    width: 44px;
+    -unity-font-style: bold;
+}
+
+.joint-slider-bar {
+    flex-grow: 1;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.joint-value-input {
+    font-size: var(--font-size-sm);
+    width: 56px;
+}
+
+.joint-unit {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    width: 12px;
+    margin-left: 2px;
+}
+
+.pose-display {
+    flex-direction: row;
+}
+
+.pose-section {
+    flex-grow: 1;
+    margin: 4px;
+}
+
+.pose-section-title {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    margin-bottom: 2px;
+}
+
+.pose-value {
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    margin-left: 4px;
+    padding: 1px 0;
+}

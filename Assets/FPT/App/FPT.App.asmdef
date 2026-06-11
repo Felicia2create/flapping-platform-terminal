@@ -1,0 +1,20 @@
+{
+    "name": "FPT.App",
+    "rootNamespace": "FPT.App",
+    "references": [
+        "FPT.Core",
+        "FPT.Communication",
+        "FPT.Business",
+        "FPT.UI",
+        "FPT.Visualization"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,21 @@
+{
+    "name": "FPT.Editor",
+    "rootNamespace": "FPT.Editor",
+    "references": [
+        "FPT.Core",
+        "FPT.Business",
+        "FPT.Visualization",
+        "FPT.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
