@@ -36,6 +36,13 @@ namespace FPT.Communication
             Debug.Log($"[Ros2Bridge] 订阅话题: {topic}");
         }
 
+        /// <summary> 注册发布者 — 纯发布话题（无订阅）需先注册才能 Publish </summary>
+        public void RegisterPublisher<T>(string topic) where T : Unity.Robotics.ROSTCPConnector.MessageGeneration.Message
+        {
+            _ros.RegisterPublisher<T>(topic);
+            Debug.Log($"[Ros2Bridge] 注册发布: {topic}");
+        }
+
         /// <summary> 通用发布 </summary>
         public void Publish<T>(string topic, T message) where T : Unity.Robotics.ROSTCPConnector.MessageGeneration.Message
         {
@@ -93,6 +100,25 @@ namespace FPT.Communication
         {
             Publish("/gripper_command", new RosMessageTypes.Std.Float32Msg { data = (float)opening });
         }
+
+        /// <summary> 发布 Bool 触发信号（用于 /execute 等话题） </summary>
+        public void PublishBool(string topic, bool value = true)
+        {
+            Publish(topic, new RosMessageTypes.Std.BoolMsg { data = value });
+        }
+
+        /// <summary> 订阅 PoseStamped 话题 </summary>
+        public void SubscribePoseStamped(string topic, Action<RosMessageTypes.Geometry.PoseStampedMsg> callback)
+        {
+            Subscribe(topic, callback);
+        }
+
+        /// <summary> 订阅 String 话题 </summary>
+        public void SubscribeString(string topic, Action<RosMessageTypes.Std.StringMsg> callback)
+        {
+            Subscribe(topic, callback);
+        }
+
         private static double[] RadToDeg(double[] rad)
         {
             var deg = new double[rad.Length];

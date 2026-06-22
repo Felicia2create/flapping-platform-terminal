@@ -66,7 +66,7 @@ namespace FPT.UI
                 };
                 _connectionIndicator.AddToClassList(dotClass);
 
-                _modeLabel.text = arm.Mode.ToString();
+                // 模式状态由控制面板 ModeHintLabel / PlanStatusLabel 展示
             }
         }
 

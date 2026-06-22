@@ -1,0 +1,15 @@
+{
+  "name": "up_down_demo",
+  "description": "机械臂上下往复演示（仅 6 关节，转台由 Unity 独立控制）",
+  "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"],
+  "total_duration_s": 0,
+  "waypoints": [
+    {"time_s": 0.0, "angles_deg": [0, 0, 0, 0, 0, 0]},
+    {"time_s": 0.5, "angles_deg": [10, -15, 30, 5, -10, 0]},
+    {"time_s": 1.5, "angles_deg": [20, -35, 60, 10, -20, 0]},
+    {"time_s": 3.0, "angles_deg": [30, -55, 90, 15, -30, 0]},
+    {"time_s": 4.5, "angles_deg": [20, -35, 60, 10, -20, 0]},
+    {"time_s": 5.5, "angles_deg": [10, -15, 30, 5, -10, 0]},
+    {"time_s": 6.0, "angles_deg": [0, 0, 0, 0, 0, 0]}
+  ]
+}

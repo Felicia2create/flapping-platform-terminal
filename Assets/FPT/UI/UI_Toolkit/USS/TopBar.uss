@@ -1,17 +1,17 @@
-/* === 顶栏 === */
 .top-bar {
     height: var(--topbar-height);
     min-height: var(--topbar-height);
-    background-color: var(--color-panel);
+    background-color: rgba(255, 255, 255, 0.92);
     flex-direction: row;
     align-items: center;
-    padding-left: 12px;
-    padding-right: 12px;
-    border-bottom-width: 1px;
-    border-bottom-color: var(--color-border);
+    padding-left: 14px;
+    padding-right: 14px;
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
 }
 
-/* === 顶栏左/中/右分区 === */
 .top-bar-left {
     flex-direction: row;
     align-items: center;
@@ -32,7 +32,7 @@
 }
 
 .top-bar-title {
-    font-size: 14px;
+    font-size: 21px;
     color: var(--color-accent);
     -unity-font-style: bold;
     margin-right: 12px;
@@ -40,42 +40,99 @@
 
 .top-bar-device {
     font-size: var(--font-size);
-    color: var(--color-text);
+    color: var(--color-accent2);
+    -unity-font-style: bold;
 }
 
 .top-bar-status {
     font-size: var(--font-size-sm);
     color: var(--color-text-dim);
-    margin-left: 6px;
+    -unity-font-style: bold;
 }
 
 .top-bar-mode {
     font-size: var(--font-size-sm);
     color: var(--color-accent2);
+    -unity-font-style: bold;
+    background-color: rgba(0, 168, 190, 0.1);
+    border-width: 1px;
+    border-color: rgba(0, 168, 190, 0.4);
+    border-radius: 6px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
     margin-right: 16px;
 }
 
 .top-bar-fps {
     font-size: var(--font-size-sm);
     color: var(--color-text-dim);
+    -unity-font-style: bold;
 }
 
-/* === 连接状态指示灯 === */
+.status-pill {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(100, 116, 139, 0.1);
+    border-width: 1px;
+    border-color: rgba(100, 116, 139, 0.35);
+    border-radius: 999px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 10px;
+}
+
+.status-pill.connected {
+    background-color: rgba(0, 168, 190, 0.1);
+    border-color: rgba(0, 168, 190, 0.4);
+}
+
+.status-pill.error {
+    background-color: rgba(220, 60, 50, 0.1);
+    border-color: rgba(220, 60, 50, 0.35);
+}
+
 .status-dot {
     width: 8px;
     height: 8px;
     border-radius: 4px;
-    margin-right: 4px;
+    margin-right: 6px;
+    background-color: var(--color-text-dim);
 }
 
 .status-dot.connected {
     background-color: var(--color-accent2);
 }
 
-.status-dot {
-    background-color: var(--color-text-dim);
-}
-
 .status-dot.error {
     background-color: var(--color-danger);
+}
+
+.nav-button {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    background-color: transparent;
+    border-width: 0;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: var(--radius);
+}
+
+.nav-button:hover {
+    color: var(--color-accent);
+    background-color: rgba(88, 166, 255, 0.1);
+}
+
+.nav-button.nav-active {
+    color: white;
+    background-color: var(--color-accent);
 }

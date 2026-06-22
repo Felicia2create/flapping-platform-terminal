@@ -1,4 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" display-name="MainLayout" editor-extension-mode="False">
+    <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/Main.uss?fileID=7433441132597879392&amp;guid=a86a23b287656c643b1ca2d6eba544dc&amp;type=3#Main" />
+    <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/TopBar.uss?fileID=7433441132597879392&amp;guid=48d84f32cfd824f40b27e186272c4a9a&amp;type=3#TopBar" />
+    <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/Panels.uss?fileID=7433441132597879392&amp;guid=2e1815de5cdd15c458099edf007a7d83&amp;type=3#Panels" />
+    <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/Widgets.uss?fileID=7433441132597879392&amp;guid=56ac3c947c94bb944bc7f267981a0dc9&amp;type=3#Widgets" />
     <ui:VisualElement name="TopBar" class="top-bar">
         <ui:VisualElement name="TopBarLeft" class="top-bar-left">
             <ui:Label name="AppTitle" text="FPT 终端" class="top-bar-title" />
@@ -8,122 +12,174 @@
         <ui:VisualElement name="TopBarCenter" class="top-bar-center">
             <ui:Label name="DeviceNameLabel" text="Flapping Platform Terminal" enable-rich-text="true" class="top-bar-device" />
         </ui:VisualElement>
+        <ui:Button name="NavAnimationButton" text="动画演示" class="nav-button" style="-unity-font-style: bold;" />
         <ui:VisualElement name="TopBarRight" class="top-bar-right">
-            <ui:Label name="ModeLabel" text="IDLE" class="top-bar-mode" />
-            <ui:Label name="FpsLabel" text="FPS: --" class="top-bar-fps" />
+            <ui:Button name="NavControlButton" text="控制面板" class="nav-button nav-active" style="-unity-font-style: bold;" />
+            <ui:Label name="FpsLabel" text="FPS: ---" class="top-bar-fps" style="width: 70px;" />
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="MainArea" class="main-area">
-        <ui:VisualElement name="LeftPanel" class="left-panel">
-            <ui:Label text="实时数据" class="panel-header" />
-            <ui:VisualElement name="ArmSection" class="data-section">
-                <ui:Label text="▸ 机械臂关节" class="section-title" />
-                <ui:VisualElement name="JointDataContainer" class="joint-list">
-                    <ui:Label text="J1: --°" name="JLabel0" class="data-label" />
-                    <ui:Label text="J2: --°" name="JLabel1" class="data-label" />
-                    <ui:Label text="J3: --°" name="JLabel2" class="data-label" />
-                    <ui:Label text="J4: --°" name="JLabel3" class="data-label" />
-                    <ui:Label text="J5: --°" name="JLabel4" class="data-label" />
-                    <ui:Label text="J6: --°" name="JLabel5" class="data-label" />
+        <ui:VisualElement name="ControlPage" class="page-container" style="display: flex; visibility: visible; overflow: hidden; opacity: 1;">
+            <ui:VisualElement name="LeftPanel" class="left-panel" style="width: 260px;">
+                <ui:Label text="实时数据" class="panel-header" />
+                <ui:VisualElement class="data-section">
+                    <ui:Label text="▸ 转台" class="section-title" />
+                    <ui:Label name="TurntableAngle" text="角度: --°" class="data-label" style="-unity-font-style: bold;" />
                 </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement class="data-section">
-                <ui:Label text="▸ 转台" class="section-title" />
-                <ui:Label name="TurntableAngle" text="角度: --°" class="data-label" />
-            </ui:VisualElement>
-            <ui:VisualElement name="PoseSection" class="data-section">
-                <ui:Label text="▸ 末端位姿" class="section-title" />
-                <ui:VisualElement name="PoseDisplayRoot" class="pose-display">
-                    <ui:VisualElement class="pose-section">
-                        <ui:Label text="位置 (m)" class="pose-section-title" />
-                        <ui:Label name="PosXLabel" text="X: --" class="pose-value" />
-                        <ui:Label name="PosYLabel" text="Y: --" class="pose-value" />
-                        <ui:Label name="PosZLabel" text="Z: --" class="pose-value" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="pose-section">
-                        <ui:Label text="姿态 (°)" class="pose-section-title" />
-                        <ui:Label name="RotRLabel" text="R: --" class="pose-value" />
-                        <ui:Label name="RotPLabel" text="P: --" class="pose-value" />
-                        <ui:Label name="RotYLabel" text="Y: --" class="pose-value" />
+                <ui:VisualElement name="ArmSection" class="data-section" style="-unity-font-style: normal;">
+                    <ui:Label text="▸ 机械臂关节" class="section-title" />
+                    <ui:VisualElement name="JointDataContainer" class="joint-list" style="-unity-font-style: normal;">
+                        <ui:Label text="Joint1: --°" name="JLabel0" class="data-label" style="-unity-font-style: bold;" />
+                        <ui:Label text="Joint2: --°" name="JLabel1" class="data-label" style="-unity-font-style: bold;" />
+                        <ui:Label text="Joint3: --°" name="JLabel2" class="data-label" style="-unity-font-style: bold;" />
+                        <ui:Label text="Joint4: --°" name="JLabel3" class="data-label" style="-unity-font-style: bold;" />
+                        <ui:Label text="Joint5: --°" name="JLabel4" class="data-label" style="-unity-font-style: bold;" />
+                        <ui:Label text="Joint6: --°" name="JLabel5" class="data-label" style="-unity-font-style: bold;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <ui:VisualElement name="PoseSection" class="data-section">
+                    <ui:Label text="▸ 末端位姿" class="section-title" />
+                    <ui:VisualElement name="PoseDisplayRoot" class="pose-display">
+                        <ui:VisualElement class="pose-section">
+                            <ui:Label text="位置 (m)" class="pose-section-title" />
+                            <ui:Label name="PosXLabel" text="X: --" class="pose-value" style="-unity-font-style: bold; font-size: 16px;" />
+                            <ui:Label name="PosYLabel" text="Y: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
+                            <ui:Label name="PosZLabel" text="Z: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="pose-section">
+                            <ui:Label text="姿态 (°)" class="pose-section-title" />
+                            <ui:Label name="RotRLabel" text="R: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
+                            <ui:Label name="RotPLabel" text="P: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
+                            <ui:Label name="RotYLabel" text="Y: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="data-section">
+                    <ui:Label text="▸ 传感器" class="section-title" />
+                    <ui:Label text="暂无数据" class="placeholder-text" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement class="data-section">
-                <ui:Label text="▸ 传感器" class="section-title" />
-                <ui:Label text="暂无数据" class="placeholder-text" />
+            <ui:VisualElement name="ControlCenterView" picking-mode="Ignore" class="center-view" />
+            <ui:VisualElement name="RightPanel" class="right-panel" style="width: 320px;">
+                <ui:Label text="控制面板" class="panel-header" />
+                <ui:VisualElement class="ee-input-row">
+                    <ui:Label text="参考系:" class="ee-label" style="width: 40px; -unity-font-style: bold; color: rgb(30, 120, 230);" />
+                    <ui:DropdownField name="FrameSelector" choices="world,platform_base_link,platform_plate_Link,base_link,link1,link2,link3,link4,link5,link6" index="0" class="frame-selector" style="height: auto; width: 185px;" />
+                </ui:VisualElement>
+                <ui:VisualElement class="control-section" style="height: 345px;">
+                    <ui:Label text="▸ 关节控制" class="section-title" />
+                    <ui:VisualElement name="JointSliderContainer" class="joint-slider-list" style="width: 235px; height: 300px;">
+                        <ui:VisualElement class="joint-slider" style="width: 300px;">
+                            <ui:Label name="JName0" text="Joint1" class="joint-name" />
+                            <ui:Slider name="JSlider0" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 20px;" />
+                            <ui:FloatField name="JValue0" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; width: 64px;" />
+                            <ui:Label text="°" class="joint-unit" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="joint-slider" style="width: 300px;">
+                            <ui:Label name="JName1" text="Joint2" class="joint-name" />
+                            <ui:Slider name="JSlider1" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 20px;" />
+                            <ui:FloatField name="JValue1" value="0" class="joint-value-input" style="-unity-font-style: normal; font-size: 10px; width: 64px;" />
+                            <ui:Label text="°" class="joint-unit" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="joint-slider" style="width: 300px;">
+                            <ui:Label name="JName2" text="Joint3" class="joint-name" style="width: 48px;" />
+                            <ui:Slider name="JSlider2" low-value="-178" high-value="145" value="0" class="joint-slider-bar" style="width: 20px;" />
+                            <ui:FloatField name="JValue2" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; width: 64px;" />
+                            <ui:Label text="°" class="joint-unit" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="joint-slider" style="width: 300px;">
+                            <ui:Label name="JName3" text="Joint4" class="joint-name" />
+                            <ui:Slider name="JSlider3" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 20px;" />
+                            <ui:FloatField name="JValue3" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; height: 36px; width: 64px;" />
+                            <ui:Label text="°" class="joint-unit" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="joint-slider" style="width: 300px;">
+                            <ui:Label name="JName4" text="Joint5" class="joint-name" />
+                            <ui:Slider name="JSlider4" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 20px;" />
+                            <ui:FloatField name="JValue4" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; width: 64px;" />
+                            <ui:Label text="°" class="joint-unit" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="joint-slider" style="width: 300px;">
+                            <ui:Label name="JName5" text="Joint6" class="joint-name" />
+                            <ui:Slider name="JSlider5" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 20px;" />
+                            <ui:FloatField name="JValue5" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; width: 64px;" />
+                            <ui:Label text="°" class="joint-unit" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="control-section" style="height: 220px;">
+                    <ui:Label text="▸ 末端位姿控制" class="section-title" />
+                    <ui:VisualElement class="pose-display">
+                        <ui:VisualElement class="pose-section">
+                            <ui:Label text="位置 (m)" class="pose-section-title" />
+                            <ui:VisualElement class="ee-input-row">
+                                <ui:Label text="X" class="ee-label" style="width: 12px; -unity-font-style: bold; color: rgb(0, 0, 0);" />
+                                <ui:FloatField name="EeInputX" value="0" class="ee-input" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="ee-input-row">
+                                <ui:Label text="Y" class="ee-label" style="width: 12px; -unity-font-style: bold; color: rgb(0, 0, 0);" />
+                                <ui:FloatField name="EeInputY" value="0" class="ee-input" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="ee-input-row">
+                                <ui:Label text="Z" class="ee-label" style="width: 12px; -unity-font-style: bold; color: rgb(0, 0, 0);" />
+                                <ui:FloatField name="EeInputZ" value="0" class="ee-input" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="pose-section">
+                            <ui:Label text="姿态 (°)" class="pose-section-title" />
+                            <ui:VisualElement class="ee-input-row">
+                                <ui:Label text="R" class="ee-label" style="width: 12px; -unity-font-style: bold; color: rgb(0, 0, 0);" />
+                                <ui:FloatField name="EeInputRoll" value="0" class="ee-input" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="ee-input-row">
+                                <ui:Label text="P" class="ee-label" style="width: 12px; -unity-font-style: bold; color: rgb(0, 0, 0);" />
+                                <ui:FloatField name="EeInputPitch" value="0" class="ee-input" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="ee-input-row">
+                                <ui:Label text="Y" class="ee-label" style="width: 12px; -unity-font-style: bold; color: rgb(0, 0, 0);" />
+                                <ui:FloatField name="EeInputYaw" value="0" class="ee-input" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="control-section">
+                    <ui:Label text="▸ 操作" class="section-title" />
+                    <ui:Label name="ModeHintLabel" text="模式: --" class="mode-hint" style="-unity-font-style: bold;" />
+                    <ui:Label name="PlanStatusLabel" class="plan-status" />
+                    <ui:VisualElement class="button-row">
+                        <ui:Button name="ConfirmButton" text="确认执行" class="confirm-button" style="-unity-font-style: bold;" />
+                        <ui:Button name="CancelButton" text="取消" class="cancel-button" style="-unity-font-style: bold;" />
+                    </ui:VisualElement>
+                    <ui:Button name="StopButton" text="紧急停止" class="stop-button" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="CenterView" picking-mode="Ignore" class="center-view" />
-        <ui:VisualElement name="RightPanel" class="right-panel" style="width: 260px;">
-            <ui:Label text="控制面板" class="panel-header" />
-            <ui:VisualElement class="control-section">
-                <ui:Label text="▸ 关节控制" class="section-title" />
-                <ui:VisualElement name="JointSliderContainer" class="joint-slider-list" style="width: 132px;">
-                    <ui:VisualElement class="joint-slider" style="width: 240px;">
-                        <ui:Label name="JName0" text="Joint1" class="joint-name" />
-                        <ui:Slider name="JSlider0" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 20px;" />
-                        <ui:FloatField name="JValue0" value="0" class="joint-value-input" style="width: 35px; height: 30px;" />
-                        <ui:Label text="°" class="joint-unit" />
+        <ui:VisualElement name="AnimationPage" class="page-container" style="display: none;">
+            <ui:VisualElement name="AnimationCenterView" picking-mode="Ignore" class="center-view-anim" />
+            <ui:VisualElement name="AnimationRightPanel" class="right-panel-anim">
+                <ui:Button name="CollapseRightBtn" text="▶" class="panel-collapse-btn" />
+                <ui:VisualElement class="panel-inner">
+                    <ui:Label text="播放控制" class="panel-header" />
+                    <ui:Label name="AnimStatusLabel" text="就绪" class="animation-status" />
+                    <ui:VisualElement class="control-section">
+                        <ui:Label text="▸ 播放" class="section-title" />
+                        <ui:Button name="PlayButton" text="▶ 播放" class="play-button" />
                     </ui:VisualElement>
-                    <ui:VisualElement class="joint-slider" style="width: 240px;">
-                        <ui:Label name="JName1" text="Joint2" class="joint-name" />
-                        <ui:Slider name="JSlider1" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 20px;" />
-                        <ui:FloatField name="JValue1" value="0" class="joint-value-input" style="width: 35px; height: 30px;" />
-                        <ui:Label text="°" class="joint-unit" />
+                    <ui:VisualElement class="control-section">
+                        <ui:Label text="▸ 机械臂倍速" class="section-title" />
+                        <ui:VisualElement class="speed-row">
+                            <ui:Slider name="SpeedSlider" low-value="0.1" high-value="5" value="1" class="speed-slider" />
+                            <ui:Label name="SpeedValueLabel" text="1.0x" class="speed-value" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement class="joint-slider" style="width: 240px;">
-                        <ui:Label name="JName2" text="Joint3" class="joint-name" />
-                        <ui:Slider name="JSlider2" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 20px;" />
-                        <ui:FloatField name="JValue2" value="0" class="joint-value-input" style="width: 35px; height: 30px;" />
-                        <ui:Label text="°" class="joint-unit" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="joint-slider" style="width: 240px;">
-                        <ui:Label name="JName3" text="Joint4" class="joint-name" />
-                        <ui:Slider name="JSlider3" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 20px;" />
-                        <ui:FloatField name="JValue3" value="0" class="joint-value-input" style="width: 35px; height: 30px;" />
-                        <ui:Label text="°" class="joint-unit" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="joint-slider" style="width: 240px;">
-                        <ui:Label name="JName4" text="Joint5" class="joint-name" />
-                        <ui:Slider name="JSlider4" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 20px;" />
-                        <ui:FloatField name="JValue4" value="0" class="joint-value-input" style="width: 35px; height: 30px;" />
-                        <ui:Label text="°" class="joint-unit" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="joint-slider" style="width: 240px;">
-                        <ui:Label name="JName5" text="Joint6" class="joint-name" />
-                        <ui:Slider name="JSlider5" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 20px;" />
-                        <ui:FloatField name="JValue5" value="0" class="joint-value-input" style="width: 35px; height: 30px;" />
-                        <ui:Label text="°" class="joint-unit" />
+                    <ui:VisualElement class="control-section">
+                        <ui:Label text="▸ 转台转速" class="section-title" />
+                        <ui:VisualElement class="speed-row">
+                            <ui:Slider name="PlateSpeedSlider" low-value="0" high-value="90" value="0" class="speed-slider" />
+                            <ui:Label name="PlateSpeedValueLabel" text="0°/s" class="speed-value" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement class="control-section">
-                <ui:Label text="▸ 末端位姿控制" class="section-title" />
-                <ui:VisualElement class="ee-input-row">
-                    <ui:Label text="X:" class="ee-label" />
-                    <ui:FloatField name="EeInputX" value="0" class="ee-input" style="width: 35px;" />
-                    <ui:Label text="Y:" class="ee-label" />
-                    <ui:FloatField name="EeInputY" value="0" class="ee-input" style="width: 35px;" />
-                    <ui:Label text="Z:" class="ee-label" />
-                    <ui:FloatField name="EeInputZ" value="0" class="ee-input" style="width: 35px;" />
-                </ui:VisualElement>
-                <ui:VisualElement class="ee-input-row">
-                    <ui:Label text="R:" class="ee-label" />
-                    <ui:FloatField name="EeInputRoll" value="0" class="ee-input" style="width: 35px;" />
-                    <ui:Label text="P:" class="ee-label" />
-                    <ui:FloatField name="EeInputPitch" value="0" class="ee-input" style="width: 35px;" />
-                    <ui:Label text="Y:" class="ee-label" />
-                    <ui:FloatField name="EeInputYaw" value="0" class="ee-input" style="width: 35px;" />
-                </ui:VisualElement>
-                <ui:Button name="EeSendButton" text="发送末端位姿" class="action-button" />
-            </ui:VisualElement>
-            <ui:VisualElement class="control-section">
-                <ui:Label text="▸ 模式" class="section-title" />
-                <ui:VisualElement class="button-row">
-                    <ui:Button name="JointModeButton" text="关节空间" class="mode-button" />
-                    <ui:Button name="CartesianModeButton" text="笛卡尔" class="mode-button" />
-                </ui:VisualElement>
-                <ui:Button name="StopButton" text="紧急停止" class="stop-button" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

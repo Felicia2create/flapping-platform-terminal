@@ -25,9 +25,9 @@ MonoBehaviour:
   m_Match: 0.5
   m_SortingOrder: 0
   m_TargetDisplay: 0
-  m_ClearDepthStencil: 0
+  m_ClearDepthStencil: 1
   m_ClearColor: 0
-  m_ColorClearValue: {r: 0, g: 0, b: 0, a: 0}
+  m_ColorClearValue: {r: 0.86274517, g: 0.86274517, b: 0.86274517, a: 0}
   m_DynamicAtlasSettings:
     m_MinAtlasSize: 64
     m_MaxAtlasSize: 4096
@@ -36,4 +36,4 @@ MonoBehaviour:
   m_AtlasBlitShader: {fileID: 9101, guid: 0000000000000000f000000000000000, type: 0}
   m_RuntimeShader: {fileID: 9100, guid: 0000000000000000f000000000000000, type: 0}
   m_RuntimeWorldShader: {fileID: 9102, guid: 0000000000000000f000000000000000, type: 0}
-  textSettings: {fileID: 0}
+  textSettings: {fileID: 11400000, guid: eaa2c579698bf52409df0337aa8de214, type: 2}

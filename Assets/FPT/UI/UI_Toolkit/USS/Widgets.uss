@@ -1,36 +1,72 @@
 .joint-slider {
     flex-direction: row;
     align-items: center;
-    margin-top: 2px; margin-bottom: 2px;
-    margin-left: 0; margin-right: 0;
-    padding-top: 2px; padding-bottom: 2px;
-    padding-left: 4px; padding-right: 4px;
-    background-color: var(--color-surface);
-    border-radius: var(--radius);
+    margin-top: 3px;
+    margin-bottom: 3px;
+    margin-left: 0;
+    margin-right: 0;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    background-color: transparent;
+    border-width: 0;
 }
 
 .joint-name {
-    font-size: var(--font-size-sm);
+    font-size: 17px;
     color: var(--color-accent);
-    width: 44px;
+    width: 48px;
     -unity-font-style: bold;
 }
 
 .joint-slider-bar {
     flex-grow: 1;
-    margin-left: 4px;
-    margin-right: 4px;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.unity-base-slider__tracker {
+    background-color: rgba(30, 120, 230, 0.45);
+    border-width: 0;
+    border-radius: 3px;
+    height: 6px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.unity-base-slider--horizontal .unity-base-slider__dragger {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background-color: var(--color-accent);
+    border-width: 0;
+    margin-top: -7px;
+}
+
+.unity-base-slider--horizontal .unity-base-slider__dragger:hover {
+    background-color: var(--color-accent2);
 }
 
 .joint-value-input {
-    font-size: var(--font-size-sm);
-    width: 56px;
+    font-size: 16px;
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    width: 68px;
+    height: 36px;
+}
+
+.joint-value-input .unity-base-text-field__input {
+    font-size: 16px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .joint-unit {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size);
     color: var(--color-text-dim);
-    width: 12px;
+    -unity-font-style: bold;
+    width: 14px;
     margin-left: 2px;
 }
 

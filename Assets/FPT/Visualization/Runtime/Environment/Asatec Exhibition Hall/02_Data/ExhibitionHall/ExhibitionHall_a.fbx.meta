@@ -1,0 +1,225 @@
+fileFormatVersion: 2
+guid: 04923568b634af44bbe8ab23ffb7fb88
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: ExhibitionHall_obj01
+    100004: ExhibitionHall_obj02
+    100006: ExhibitionHall_obj03
+    100008: ExhibitionHall_a_MeshPart0
+    100010: ExhibitionHall_a_MeshPart1
+    100012: ExhibitionHall_a_MeshPart2
+    100014: ExhibitionHall_a_MeshPart3
+    100016: ExhibitionHall_a_MeshPart4
+    100018: ExhibitionHall_a_MeshPart5
+    100020: ExhibitionHall_LAM01
+    100022: ExhibitionHall_LAM01_MeshPart0
+    100024: ExhibitionHall_LAM01_MeshPart1
+    100026: ExhibitionHall_LAM02
+    100028: ExhibitionHall_LAM03
+    100030: ExhibitionHall_LAM04
+    100032: ExhibitionHall_LAM05
+    100034: ExhibitionLight_LAM01
+    100036: ExhibitionLight_LAM02
+    100038: ExhibitionLightMetal_LAM01
+    100040: ExhibitionLightMetal_LAM01_MeshPart0
+    100042: ExhibitionLightMetal_LAM01_MeshPart1
+    100044: ExhibitionLightMetal_LAM01_MeshPart2
+    100046: ExhibitionLightMetal_LAM01_MeshPart3
+    100048: ExhibitionHall_LAM01a
+    100050: ExhibitionHall_LAM01a_MeshPart0
+    100052: ExhibitionHall_LAM01a_MeshPart1
+    100054: ExhibitionHall_LAM01b
+    400000: //RootNode
+    400002: ExhibitionHall_obj01
+    400004: ExhibitionHall_obj02
+    400006: ExhibitionHall_obj03
+    400008: ExhibitionHall_a_MeshPart0
+    400010: ExhibitionHall_a_MeshPart1
+    400012: ExhibitionHall_a_MeshPart2
+    400014: ExhibitionHall_a_MeshPart3
+    400016: ExhibitionHall_a_MeshPart4
+    400018: ExhibitionHall_a_MeshPart5
+    400020: ExhibitionHall_LAM01
+    400022: ExhibitionHall_LAM01_MeshPart0
+    400024: ExhibitionHall_LAM01_MeshPart1
+    400026: ExhibitionHall_LAM02
+    400028: ExhibitionHall_LAM03
+    400030: ExhibitionHall_LAM04
+    400032: ExhibitionHall_LAM05
+    400034: ExhibitionLight_LAM01
+    400036: ExhibitionLight_LAM02
+    400038: ExhibitionLightMetal_LAM01
+    400040: ExhibitionLightMetal_LAM01_MeshPart0
+    400042: ExhibitionLightMetal_LAM01_MeshPart1
+    400044: ExhibitionLightMetal_LAM01_MeshPart2
+    400046: ExhibitionLightMetal_LAM01_MeshPart3
+    400048: ExhibitionHall_LAM01a
+    400050: ExhibitionHall_LAM01a_MeshPart0
+    400052: ExhibitionHall_LAM01a_MeshPart1
+    400054: ExhibitionHall_LAM01b
+    2100000: ExhibitionHall_LAM02
+    2100002: ExhibitionHall_LAM01
+    2100004: ExhibitionLightMetal_LAM01
+    2100006: ExhibitionLight_LAM01
+    2100008: ExhibitionHall_LAM03
+    2100010: ExhibitionLight_LAM02
+    2100012: ExhibitionHall_LAM04
+    2100014: ExhibitionHall_LAM05
+    2300000: ExhibitionHall_obj01
+    2300002: ExhibitionHall_obj02
+    2300004: ExhibitionHall_obj03
+    2300006: //RootNode
+    2300008: ExhibitionHall_a_MeshPart0
+    2300010: ExhibitionHall_a_MeshPart1
+    2300012: ExhibitionHall_a_MeshPart2
+    2300014: ExhibitionHall_a_MeshPart3
+    2300016: ExhibitionHall_a_MeshPart4
+    2300018: ExhibitionHall_a_MeshPart5
+    2300020: ExhibitionHall_LAM01_MeshPart0
+    2300022: ExhibitionHall_LAM01_MeshPart1
+    2300024: ExhibitionHall_LAM02
+    2300026: ExhibitionHall_LAM03
+    2300028: ExhibitionHall_LAM04
+    2300030: ExhibitionHall_LAM05
+    2300032: ExhibitionLight_LAM01
+    2300034: ExhibitionLight_LAM02
+    2300036: ExhibitionLightMetal_LAM01_MeshPart0
+    2300038: ExhibitionLightMetal_LAM01_MeshPart1
+    2300040: ExhibitionLightMetal_LAM01_MeshPart2
+    2300042: ExhibitionLightMetal_LAM01_MeshPart3
+    2300044: ExhibitionHall_LAM01a_MeshPart0
+    2300046: ExhibitionHall_LAM01a_MeshPart1
+    2300048: ExhibitionHall_LAM01b
+    2300050: ExhibitionLightMetal_LAM01
+    2300052: ExhibitionHall_LAM01a
+    3300000: ExhibitionHall_obj01
+    3300002: ExhibitionHall_obj02
+    3300004: ExhibitionHall_obj03
+    3300006: //RootNode
+    3300008: ExhibitionHall_a_MeshPart0
+    3300010: ExhibitionHall_a_MeshPart1
+    3300012: ExhibitionHall_a_MeshPart2
+    3300014: ExhibitionHall_a_MeshPart3
+    3300016: ExhibitionHall_a_MeshPart4
+    3300018: ExhibitionHall_a_MeshPart5
+    3300020: ExhibitionHall_LAM01_MeshPart0
+    3300022: ExhibitionHall_LAM01_MeshPart1
+    3300024: ExhibitionHall_LAM02
+    3300026: ExhibitionHall_LAM03
+    3300028: ExhibitionHall_LAM04
+    3300030: ExhibitionHall_LAM05
+    3300032: ExhibitionLight_LAM01
+    3300034: ExhibitionLight_LAM02
+    3300036: ExhibitionLightMetal_LAM01_MeshPart0
+    3300038: ExhibitionLightMetal_LAM01_MeshPart1
+    3300040: ExhibitionLightMetal_LAM01_MeshPart2
+    3300042: ExhibitionLightMetal_LAM01_MeshPart3
+    3300044: ExhibitionHall_LAM01a_MeshPart0
+    3300046: ExhibitionHall_LAM01a_MeshPart1
+    3300048: ExhibitionHall_LAM01b
+    3300050: ExhibitionLightMetal_LAM01
+    3300052: ExhibitionHall_LAM01a
+    4300000: ExhibitionHall_obj03
+    4300002: ExhibitionHall_obj02
+    4300004: ExhibitionHall_obj01
+    4300006: ExhibitionHall_a
+    4300008: ExhibitionHall_a_MeshPart0
+    4300010: ExhibitionHall_a_MeshPart1
+    4300012: ExhibitionHall_a_MeshPart2
+    4300014: ExhibitionHall_a_MeshPart3
+    4300016: ExhibitionHall_a_MeshPart4
+    4300018: ExhibitionHall_a_MeshPart5
+    4300020: ExhibitionLight_LAM01
+    4300022: ExhibitionHall_LAM02
+    4300024: ExhibitionHall_LAM01_MeshPart0
+    4300026: ExhibitionHall_LAM01_MeshPart1
+    4300028: ExhibitionHall_LAM05
+    4300030: ExhibitionHall_LAM03
+    4300032: ExhibitionLight_LAM02
+    4300034: ExhibitionHall_LAM04
+    4300036: ExhibitionLightMetal_LAM01_MeshPart0
+    4300038: ExhibitionLightMetal_LAM01_MeshPart1
+    4300040: ExhibitionLightMetal_LAM01_MeshPart2
+    4300042: ExhibitionLightMetal_LAM01_MeshPart3
+    4300044: ExhibitionHall_LAM01a_MeshPart0
+    4300046: ExhibitionHall_LAM01a_MeshPart1
+    4300048: ExhibitionLightMetal_LAM01
+    4300050: ExhibitionHall_LAM01b
+    4300052: ExhibitionHall_LAM01a
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 0
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 1
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

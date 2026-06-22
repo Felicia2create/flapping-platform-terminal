@@ -46,8 +46,8 @@ namespace FPT.Business
         {
             pipeline
                 .AddInterceptor(new JointLimitInterceptor(
-                    new double[] { -170, -120, -170, -120, -170, -120 },
-                    new double[] { 170, 120, 170, 120, 170, 120 }))
+                    new double[] { -178, -178, -178, -178, -178, -180 },
+                    new double[] { 178,   178,  145,  178,  178,  180 }))
                 .AddInterceptor(new SpeedLimitInterceptor(180, 2.0));
         }
 

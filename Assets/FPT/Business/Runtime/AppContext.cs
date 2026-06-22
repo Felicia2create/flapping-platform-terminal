@@ -14,10 +14,13 @@ namespace FPT.Business
         [SerializeField] private bool _autoConnect = false;
 
         public Ros2Bridge Ros2Bridge { get; private set; }
+        public Ros2PlanningBridge PlanningBridge { get; private set; }
+        public InputTerminal InputTerminal { get; private set; }
         public CommunicationManager CommManager { get; private set; }
         public DeviceManager DeviceManager { get; private set; }
         public DeviceCoordinator Coordinator { get; private set; }
         public RobotArmDriver ArmDriver { get; private set; }
+        public AnimationDemoController AnimationDemo { get; private set; }
 
         private void Awake()
         {
@@ -33,6 +36,8 @@ namespace FPT.Business
 
             // ROS2 桥接
             Ros2Bridge = new Ros2Bridge();
+            PlanningBridge = new Ros2PlanningBridge(Ros2Bridge);
+            InputTerminal = new InputTerminal(PlanningBridge);
 
             // 非ROS2设备管理器（传感器/变频器走串口）
             CommManager = new CommunicationManager();
@@ -54,6 +59,9 @@ namespace FPT.Business
             Coordinator.Subscribe();
 
             Debug.Log($"[AppContext] {DeviceManager.Drivers.Count} 个设备已注册");
+
+            // 动画演示控制器（由用户手动挂载，此处仅获取引用）
+            AnimationDemo = GetComponent<AnimationDemoController>();
 
             if (_autoConnect) ConnectRos2();
         }
