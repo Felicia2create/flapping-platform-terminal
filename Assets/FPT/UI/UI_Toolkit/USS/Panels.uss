@@ -65,7 +65,7 @@
 }
 
 .stop-button {
-    font-size: var(--font-size-lg);
+    font-size: 19px;
     color: var(--color-text-light);
     background-color: var(--color-danger);
     border-width: 0;
@@ -102,7 +102,7 @@
 
 .ee-input {
     font-size: var(--font-size-sm);
-    width: 60px;
+    width: 72px;
     margin-right: 4px;
 }
 
@@ -252,7 +252,7 @@
 
 .panel-collapse-btn {
     width: 24px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--color-text-dim);
     background-color: var(--color-surface);
     border-width: 0;
@@ -313,4 +313,76 @@
     color: var(--color-accent);
     width: 52px;
     -unity-text-align: middle-center;
+}
+
+/* ── 路径选择（规范 §08 分段控件：选中段 = accent 填充白字） ── */
+.path-list {
+    flex-direction: column;
+}
+
+.path-button {
+    font-size: var(--font-size);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 6px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-top: 0;
+    margin-bottom: 6px;
+    margin-left: 0;
+    margin-right: 0;
+    -unity-text-align: middle-left;
+    -unity-font-style: bold;
+}
+
+.path-button:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.path-button.path-active {
+    color: var(--color-text-light);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+/* ── 飞行参数折线图卡片（X 轴=时间） ── */
+.chart-card {
+    background-color: rgba(230, 240, 252, 0.55);
+    border-width: 1px;
+    border-color: rgba(30, 120, 230, 0.12);
+    border-radius: 6px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 6px;
+}
+
+.chart-head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.chart-title {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    -unity-font-style: bold;
+}
+
+.chart-value {
+    font-size: var(--font-size);
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+.chart-plot {
+    height: 40px;
 }

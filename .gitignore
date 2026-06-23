@@ -21,6 +21,9 @@
 # --- 编辑器个人布局 ---
 imgui.ini
 
+# --- Visual Studio ---
+.vs/
+
 # --- Rider ---
 .idea/
 *.sln.DotSettings.user

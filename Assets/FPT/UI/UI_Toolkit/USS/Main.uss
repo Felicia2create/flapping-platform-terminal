@@ -11,8 +11,8 @@
     --color-text-dim: rgb(100, 116, 139);
     --color-text-light: rgb(255, 255, 255);
     --font-size-sm: 13px;
-    --font-size: 16px;
-    --font-size-lg: 20px;
+    --font-size: 15px;
+    --font-size-lg: 18px;
     --radius: 8px;
     --panel-width: 300px;
     --panel-width-compact: 264px;
@@ -65,11 +65,9 @@
 .panel-header {
     flex-direction: row;
     align-items: center;
-    font-size: var(--font-size-lg);
-    color: var(--color-accent);
-    -unity-font-style: bold;
-    margin-bottom: 8px;
-    padding-bottom: 8px;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
     padding-left: 8px;
     border-left-width: 4px;
     border-left-color: var(--color-accent);
@@ -77,8 +75,20 @@
     border-bottom-color: rgba(30, 120, 230, 0.14);
 }
 
+.panel-header-title {
+    font-size: 20px;
+    color: var(--color-accent);
+    -unity-font-style: bold;
+}
+
+.panel-header-sub {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    -unity-font-style: bold;
+}
+
 .data-section {
-    margin-top: 8px;
+    margin-top: 16px;
     margin-bottom: 4px;
 }
 
@@ -91,23 +101,85 @@
     font-size: var(--font-size);
     color: var(--color-accent2);
     -unity-font-style: bold;
+    margin-bottom: 8px;
+}
+
+/* === 数据行（规范 §08 .data-row：标签左 / 数值右，独立圆角框） === */
+.data-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(230, 240, 252, 0.55);
+    border-width: 1px;
+    border-color: rgba(30, 120, 230, 0.12);
+    border-radius: 6px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
     margin-bottom: 6px;
 }
 
-.data-label {
+.data-row-label {
     font-size: var(--font-size);
-    color: var(--color-text);
+    color: var(--color-text-dim);
     -unity-font-style: bold;
-    margin-left: 8px;
-    padding: 2px 0;
+}
+
+.data-row-value {
+    font-size: var(--font-size);
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+/* 位置 / 姿态 等子分组小标题 */
+.data-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    -unity-font-style: bold;
+    margin-top: 4px;
+    margin-bottom: 6px;
 }
 
 .placeholder-text {
     font-size: var(--font-size);
     color: var(--color-text-dim);
     -unity-font-style: bold;
-    margin-left: 8px;
-    padding: 4px 0;
+}
+
+/* === 位姿芯片（规范 §08 .chip：3 列网格，键名上 / 数值下） === */
+.chip-row {
+    flex-direction: row;
+    margin-bottom: 6px;
+}
+
+.chip {
+    flex-grow: 1;
+    flex-basis: 0;
+    background-color: rgba(230, 240, 252, 0.6);
+    border-width: 1px;
+    border-color: rgba(30, 120, 230, 0.14);
+    border-radius: 6px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.chip-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    -unity-font-style: bold;
+}
+
+.chip-value {
+    font-size: var(--font-size-lg);
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    margin-top: 2px;
 }
 
 .page-container {

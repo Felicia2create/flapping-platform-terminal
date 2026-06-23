@@ -48,6 +48,7 @@ namespace FPT.UI
         // 折叠按钮与面板
         private Button _collapseRightBtn;
         private VisualElement _animRightPanel;
+        private VisualElement _animLeftPanel;
 
         private void OnEnable()
         {
@@ -124,6 +125,7 @@ namespace FPT.UI
             // ── 折叠按钮 ──
             _collapseRightBtn = _root.Q<Button>("CollapseRightBtn");
             _animRightPanel = _root.Q("AnimationRightPanel");
+            _animLeftPanel = _root.Q("AnimationLeftPanel");
             if (_collapseRightBtn != null)
                 _collapseRightBtn.clicked += () => TogglePanel();
 
@@ -157,6 +159,8 @@ namespace FPT.UI
                 if (_animationCenterView != null)
                     _orbitCamera.ActiveArea = ToScreenRect(_animationCenterView);
                 _orbitCamera.ExcludeAreas.Clear();
+                if (_animLeftPanel != null)
+                    _orbitCamera.ExcludeAreas.Add(ToScreenRect(_animLeftPanel));
                 if (_animRightPanel != null && !_animRightPanel.ClassListContains("collapsed"))
                     _orbitCamera.ExcludeAreas.Add(ToScreenRect(_animRightPanel));
             }

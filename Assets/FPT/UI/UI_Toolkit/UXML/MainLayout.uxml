@@ -5,110 +5,164 @@
     <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/Widgets.uss?fileID=7433441132597879392&amp;guid=56ac3c947c94bb944bc7f267981a0dc9&amp;type=3#Widgets" />
     <ui:VisualElement name="TopBar" class="top-bar">
         <ui:VisualElement name="TopBarLeft" class="top-bar-left">
+            <ui:VisualElement name="AppLogo" class="app-logo">
+                <ui:Label text="F" class="app-logo-text" />
+            </ui:VisualElement>
             <ui:Label name="AppTitle" text="FPT 终端" class="top-bar-title" />
-            <ui:VisualElement name="ConnectionIndicator" class="status-dot" />
-            <ui:Label name="ConnectionLabel" text="机械臂: 未连接" class="top-bar-status" />
+            <ui:VisualElement name="ConnectionPill" class="status-pill disconnected">
+                <ui:VisualElement name="ConnectionIndicator" class="status-dot disconnected" />
+                <ui:Label name="ConnectionLabel" text="机械臂 · 未连接" class="top-bar-status" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="TopBarCenter" class="top-bar-center">
-            <ui:Label name="DeviceNameLabel" text="Flapping Platform Terminal" enable-rich-text="true" class="top-bar-device" />
+            <ui:Label name="DeviceNameLabel" text="FLAPPING PLATFORM TERMINAL" class="top-bar-device" />
         </ui:VisualElement>
-        <ui:Button name="NavAnimationButton" text="动画演示" class="nav-button" style="-unity-font-style: bold;" />
         <ui:VisualElement name="TopBarRight" class="top-bar-right">
-            <ui:Button name="NavControlButton" text="控制面板" class="nav-button nav-active" style="-unity-font-style: bold;" />
-            <ui:Label name="FpsLabel" text="FPS: ---" class="top-bar-fps" style="width: 70px;" />
+            <ui:Button name="NavControlButton" text="控制面板" class="nav-button nav-active" />
+            <ui:Button name="NavAnimationButton" text="动画演示" class="nav-button" />
+            <ui:VisualElement name="ModeBadge" class="badge">
+                <ui:VisualElement class="badge-dot" />
+                <ui:Label name="ModeLabel" text="IDLE" class="badge-text" />
+            </ui:VisualElement>
+            <ui:Label name="FpsLabel" text="FPS --" class="top-bar-fps" style="width: 64px;" />
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="MainArea" class="main-area">
-        <ui:VisualElement name="ControlPage" class="page-container" style="display: flex; visibility: visible; overflow: hidden; opacity: 1;">
-            <ui:VisualElement name="LeftPanel" class="left-panel" style="width: 260px;">
-                <ui:Label text="实时数据" class="panel-header" />
-                <ui:VisualElement class="data-section">
-                    <ui:Label text="▸ 转台" class="section-title" />
-                    <ui:Label name="TurntableAngle" text="角度: --°" class="data-label" style="-unity-font-style: bold;" />
+        <ui:VisualElement name="ControlPage" class="page-container">
+            <ui:VisualElement name="LeftPanel" class="left-panel">
+                <ui:VisualElement class="panel-header">
+                    <ui:Label text="实时数据" class="panel-header-title" />
+                    <ui:Label text="LIVE / TELEMETRY" class="panel-header-sub" />
                 </ui:VisualElement>
-                <ui:VisualElement name="ArmSection" class="data-section" style="-unity-font-style: normal;">
-                    <ui:Label text="▸ 机械臂关节" class="section-title" />
-                    <ui:VisualElement name="JointDataContainer" class="joint-list" style="-unity-font-style: normal;">
-                        <ui:Label text="Joint1: --°" name="JLabel0" class="data-label" style="-unity-font-style: bold;" />
-                        <ui:Label text="Joint2: --°" name="JLabel1" class="data-label" style="-unity-font-style: bold;" />
-                        <ui:Label text="Joint3: --°" name="JLabel2" class="data-label" style="-unity-font-style: bold;" />
-                        <ui:Label text="Joint4: --°" name="JLabel3" class="data-label" style="-unity-font-style: bold;" />
-                        <ui:Label text="Joint5: --°" name="JLabel4" class="data-label" style="-unity-font-style: bold;" />
-                        <ui:Label text="Joint6: --°" name="JLabel5" class="data-label" style="-unity-font-style: bold;" />
+                <ui:VisualElement name="ArmSection" class="data-section">
+                    <ui:Label text="机械臂关节" class="section-title" />
+                    <ui:VisualElement name="JointDataContainer" class="joint-list">
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J1" class="data-row-label" />
+                            <ui:Label name="JLabel0" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J2" class="data-row-label" />
+                            <ui:Label name="JLabel1" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J3" class="data-row-label" />
+                            <ui:Label name="JLabel2" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J4" class="data-row-label" />
+                            <ui:Label name="JLabel3" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J5" class="data-row-label" />
+                            <ui:Label name="JLabel4" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J6" class="data-row-label" />
+                            <ui:Label name="JLabel5" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="data-section">
+                    <ui:Label text="平台" class="section-title" />
+                    <ui:VisualElement class="data-row">
+                        <ui:Label text="角度" class="data-row-label" />
+                        <ui:Label name="TurntableAngle" text="--°" class="data-row-value" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="PoseSection" class="data-section">
-                    <ui:Label text="▸ 末端位姿" class="section-title" />
-                    <ui:VisualElement name="PoseDisplayRoot" class="pose-display">
-                        <ui:VisualElement class="pose-section">
-                            <ui:Label text="位置 (m)" class="pose-section-title" />
-                            <ui:Label name="PosXLabel" text="X: --" class="pose-value" style="-unity-font-style: bold; font-size: 16px;" />
-                            <ui:Label name="PosYLabel" text="Y: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
-                            <ui:Label name="PosZLabel" text="Z: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
+                    <ui:Label text="末端位姿" class="section-title" />
+                    <ui:Label text="位置 / POSITION (m)" class="data-subtitle" />
+                    <ui:VisualElement class="chip-row">
+                        <ui:VisualElement class="chip">
+                            <ui:Label text="X" class="chip-label" />
+                            <ui:Label name="PosXLabel" text="--" class="chip-value" />
                         </ui:VisualElement>
-                        <ui:VisualElement class="pose-section">
-                            <ui:Label text="姿态 (°)" class="pose-section-title" />
-                            <ui:Label name="RotRLabel" text="R: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
-                            <ui:Label name="RotPLabel" text="P: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
-                            <ui:Label name="RotYLabel" text="Y: --" class="pose-value" style="font-size: 16px; -unity-font-style: bold;" />
+                        <ui:VisualElement class="chip">
+                            <ui:Label text="Y" class="chip-label" />
+                            <ui:Label name="PosYLabel" text="--" class="chip-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="chip">
+                            <ui:Label text="Z" class="chip-label" />
+                            <ui:Label name="PosZLabel" text="--" class="chip-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label text="姿态 / ORIENTATION (°)" class="data-subtitle" />
+                    <ui:VisualElement class="chip-row">
+                        <ui:VisualElement class="chip">
+                            <ui:Label text="R" class="chip-label" />
+                            <ui:Label name="RotRLabel" text="--" class="chip-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="chip">
+                            <ui:Label text="P" class="chip-label" />
+                            <ui:Label name="RotPLabel" text="--" class="chip-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="chip">
+                            <ui:Label text="Y" class="chip-label" />
+                            <ui:Label name="RotYLabel" text="--" class="chip-value" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="data-section">
-                    <ui:Label text="▸ 传感器" class="section-title" />
-                    <ui:Label text="暂无数据" class="placeholder-text" />
+                    <ui:Label text="传感器" class="section-title" />
+                    <ui:VisualElement class="data-row">
+                        <ui:Label text="暂无数据" class="placeholder-text" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="ControlCenterView" picking-mode="Ignore" class="center-view" />
-            <ui:VisualElement name="RightPanel" class="right-panel" style="width: 320px;">
-                <ui:Label text="控制面板" class="panel-header" />
+            <ui:VisualElement name="RightPanel" class="right-panel">
+                <ui:VisualElement class="panel-header">
+                    <ui:Label text="控制面板" class="panel-header-title" />
+                    <ui:Label text="CONTROL" class="panel-header-sub" />
+                </ui:VisualElement>
                 <ui:VisualElement class="ee-input-row">
                     <ui:Label text="参考系:" class="ee-label" style="width: 40px; -unity-font-style: bold; color: rgb(30, 120, 230);" />
                     <ui:DropdownField name="FrameSelector" choices="world,platform_base_link,platform_plate_Link,base_link,link1,link2,link3,link4,link5,link6" index="0" class="frame-selector" style="height: auto; width: 185px;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section" style="height: 345px;">
-                    <ui:Label text="▸ 关节控制" class="section-title" />
+                    <ui:Label text="关节控制" class="section-title" />
                     <ui:VisualElement name="JointSliderContainer" class="joint-slider-list" style="width: 235px; height: 300px;">
                         <ui:VisualElement class="joint-slider" style="width: 300px;">
                             <ui:Label name="JName0" text="Joint1" class="joint-name" />
                             <ui:Slider name="JSlider0" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 20px;" />
-                            <ui:FloatField name="JValue0" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; width: 64px;" />
+                            <ui:FloatField name="JValue0" value="0" class="joint-value-input" style="-unity-font-style: normal; width: 64px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider" style="width: 300px;">
                             <ui:Label name="JName1" text="Joint2" class="joint-name" />
                             <ui:Slider name="JSlider1" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 20px;" />
-                            <ui:FloatField name="JValue1" value="0" class="joint-value-input" style="-unity-font-style: normal; font-size: 10px; width: 64px;" />
+                            <ui:FloatField name="JValue1" value="0" class="joint-value-input" style="-unity-font-style: normal; width: 64px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider" style="width: 300px;">
                             <ui:Label name="JName2" text="Joint3" class="joint-name" style="width: 48px;" />
                             <ui:Slider name="JSlider2" low-value="-178" high-value="145" value="0" class="joint-slider-bar" style="width: 20px;" />
-                            <ui:FloatField name="JValue2" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; width: 64px;" />
+                            <ui:FloatField name="JValue2" value="0" class="joint-value-input" style="-unity-font-style: normal; width: 64px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider" style="width: 300px;">
                             <ui:Label name="JName3" text="Joint4" class="joint-name" />
                             <ui:Slider name="JSlider3" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 20px;" />
-                            <ui:FloatField name="JValue3" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; height: 36px; width: 64px;" />
+                            <ui:FloatField name="JValue3" value="0" class="joint-value-input" style="-unity-font-style: normal; height: 36px; width: 64px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider" style="width: 300px;">
                             <ui:Label name="JName4" text="Joint5" class="joint-name" />
                             <ui:Slider name="JSlider4" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 20px;" />
-                            <ui:FloatField name="JValue4" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; width: 64px;" />
+                            <ui:FloatField name="JValue4" value="0" class="joint-value-input" style="-unity-font-style: normal; width: 64px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider" style="width: 300px;">
                             <ui:Label name="JName5" text="Joint6" class="joint-name" />
                             <ui:Slider name="JSlider5" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 20px;" />
-                            <ui:FloatField name="JValue5" value="0" class="joint-value-input" style="font-size: 10px; -unity-font-style: normal; width: 64px;" />
+                            <ui:FloatField name="JValue5" value="0" class="joint-value-input" style="-unity-font-style: normal; width: 64px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section" style="height: 220px;">
-                    <ui:Label text="▸ 末端位姿控制" class="section-title" />
+                    <ui:Label text="末端位姿控制" class="section-title" />
                     <ui:VisualElement class="pose-display">
                         <ui:VisualElement class="pose-section">
                             <ui:Label text="位置 (m)" class="pose-section-title" />
@@ -143,7 +197,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section">
-                    <ui:Label text="▸ 操作" class="section-title" />
+                    <ui:Label text="操作" class="section-title" />
                     <ui:Label name="ModeHintLabel" text="模式: --" class="mode-hint" style="-unity-font-style: bold;" />
                     <ui:Label name="PlanStatusLabel" class="plan-status" />
                     <ui:VisualElement class="button-row">
@@ -155,28 +209,117 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="AnimationPage" class="page-container" style="display: none;">
+            <ui:VisualElement name="AnimationLeftPanel" class="left-panel">
+                <ui:VisualElement class="panel-header">
+                    <ui:Label text="参数控制" class="panel-header-title" />
+                    <ui:Label text="PARAMETERS" class="panel-header-sub" />
+                </ui:VisualElement>
+                <ui:Label name="AnimStatusLabel" text="就绪" class="animation-status" />
+                <ui:VisualElement class="control-section">
+                    <ui:Label text="路径选择" class="section-title" />
+                    <ui:VisualElement name="PathList" class="path-list">
+                        <ui:Button name="PathButton0" text="路径 1 · 8 字循环" class="path-button path-active" />
+                        <ui:Button name="PathButton1" text="路径 2 · 上下扑动" class="path-button" />
+                        <ui:Button name="PathButton2" text="路径 3 · 圆周轨迹" class="path-button" />
+                        <ui:Button name="PathButton3" text="路径 4 · 自定义" class="path-button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="control-section">
+                    <ui:Label text="播放" class="section-title" />
+                    <ui:Button name="PlayButton" text="▶ 播放" class="play-button" />
+                </ui:VisualElement>
+                <ui:VisualElement class="control-section">
+                    <ui:Label text="机械臂倍速" class="section-title" />
+                    <ui:VisualElement class="speed-row">
+                        <ui:Slider name="SpeedSlider" low-value="0.1" high-value="5" value="1" class="speed-slider" />
+                        <ui:Label name="SpeedValueLabel" text="1.0x" class="speed-value" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="control-section">
+                    <ui:Label text="转台转速" class="section-title" />
+                    <ui:VisualElement class="speed-row">
+                        <ui:Slider name="PlateSpeedSlider" low-value="0" high-value="90" value="0" class="speed-slider" />
+                        <ui:Label name="PlateSpeedValueLabel" text="0°/s" class="speed-value" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
             <ui:VisualElement name="AnimationCenterView" picking-mode="Ignore" class="center-view-anim" />
-            <ui:VisualElement name="AnimationRightPanel" class="right-panel-anim">
-                <ui:Button name="CollapseRightBtn" text="▶" class="panel-collapse-btn" />
-                <ui:VisualElement class="panel-inner">
-                    <ui:Label text="播放控制" class="panel-header" />
-                    <ui:Label name="AnimStatusLabel" text="就绪" class="animation-status" />
-                    <ui:VisualElement class="control-section">
-                        <ui:Label text="▸ 播放" class="section-title" />
-                        <ui:Button name="PlayButton" text="▶ 播放" class="play-button" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="control-section">
-                        <ui:Label text="▸ 机械臂倍速" class="section-title" />
-                        <ui:VisualElement class="speed-row">
-                            <ui:Slider name="SpeedSlider" low-value="0.1" high-value="5" value="1" class="speed-slider" />
-                            <ui:Label name="SpeedValueLabel" text="1.0x" class="speed-value" />
+            <ui:VisualElement name="AnimationRightPanel" class="right-panel">
+                <ui:VisualElement class="panel-header">
+                    <ui:Label text="数据显示" class="panel-header-title" />
+                    <ui:Label text="TELEMETRY" class="panel-header-sub" />
+                </ui:VisualElement>
+                <ui:VisualElement class="data-section">
+                    <ui:Label text="扑翼无人机飞行参数" class="section-title" />
+                    <ui:VisualElement class="chart-card">
+                        <ui:VisualElement class="chart-head">
+                            <ui:Label text="拍动频率" class="chart-title" />
+                            <ui:Label name="DroneFreqLabel" text="-- Hz" class="chart-value" />
                         </ui:VisualElement>
+                        <ui:VisualElement name="ChartFreq" class="chart-plot" />
                     </ui:VisualElement>
-                    <ui:VisualElement class="control-section">
-                        <ui:Label text="▸ 转台转速" class="section-title" />
-                        <ui:VisualElement class="speed-row">
-                            <ui:Slider name="PlateSpeedSlider" low-value="0" high-value="90" value="0" class="speed-slider" />
-                            <ui:Label name="PlateSpeedValueLabel" text="0°/s" class="speed-value" />
+                    <ui:VisualElement class="chart-card">
+                        <ui:VisualElement class="chart-head">
+                            <ui:Label text="拍动幅度" class="chart-title" />
+                            <ui:Label name="DroneAmpLabel" text="--°" class="chart-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="ChartAmp" class="chart-plot" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="chart-card">
+                        <ui:VisualElement class="chart-head">
+                            <ui:Label text="飞行速度" class="chart-title" />
+                            <ui:Label name="DroneSpeedLabel" text="-- m/s" class="chart-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="ChartSpeed" class="chart-plot" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="chart-card">
+                        <ui:VisualElement class="chart-head">
+                            <ui:Label text="攻角" class="chart-title" />
+                            <ui:Label name="DroneAoaLabel" text="--°" class="chart-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="ChartAoa" class="chart-plot" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="chart-card">
+                        <ui:VisualElement class="chart-head">
+                            <ui:Label text="升力" class="chart-title" />
+                            <ui:Label name="DroneLiftLabel" text="-- N" class="chart-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="ChartLift" class="chart-plot" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="chart-card">
+                        <ui:VisualElement class="chart-head">
+                            <ui:Label text="飞行高度" class="chart-title" />
+                            <ui:Label name="DroneAltLabel" text="-- m" class="chart-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="ChartAlt" class="chart-plot" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="data-section">
+                    <ui:Label text="机械臂关节" class="section-title" />
+                    <ui:VisualElement class="joint-list">
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J1" class="data-row-label" />
+                            <ui:Label name="AnimJLabel0" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J2" class="data-row-label" />
+                            <ui:Label name="AnimJLabel1" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J3" class="data-row-label" />
+                            <ui:Label name="AnimJLabel2" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J4" class="data-row-label" />
+                            <ui:Label name="AnimJLabel3" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J5" class="data-row-label" />
+                            <ui:Label name="AnimJLabel4" text="--°" class="data-row-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="data-row">
+                            <ui:Label text="J6" class="data-row-label" />
+                            <ui:Label name="AnimJLabel5" text="--°" class="data-row-value" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>

@@ -16,6 +16,7 @@ namespace FPT.UI
 
         private readonly Label _connectionLabel;
         private readonly VisualElement _connectionIndicator;
+        private readonly VisualElement _connectionPill;
         private readonly Label _modeLabel;
         private readonly Label _fpsLabel;
 
@@ -29,6 +30,7 @@ namespace FPT.UI
 
             _connectionLabel = root?.Q<Label>("ConnectionLabel");
             _connectionIndicator = root?.Q<VisualElement>("ConnectionIndicator");
+            _connectionPill = root?.Q<VisualElement>("ConnectionPill");
             _modeLabel = root?.Q<Label>("ModeLabel");
             _fpsLabel = root?.Q<Label>("FpsLabel");
 
@@ -47,16 +49,12 @@ namespace FPT.UI
             {
                 _connectionLabel.text = arm.Connection switch
                 {
-                    DeviceConnectionState.Operational => "机械臂: 运行中",
-                    DeviceConnectionState.Connected => "机械臂: 已连接",
-                    DeviceConnectionState.Connecting => "机械臂: 连接中...",
-                    DeviceConnectionState.Error => "机械臂: 异常",
-                    _ => "机械臂: 未连接",
+                    DeviceConnectionState.Operational => "机械臂 · 运行中",
+                    DeviceConnectionState.Connected => "机械臂 · 已连接",
+                    DeviceConnectionState.Connecting => "机械臂 · 连接中...",
+                    DeviceConnectionState.Error => "机械臂 · 异常",
+                    _ => "机械臂 · 未连接",
                 };
-
-                _connectionIndicator.RemoveFromClassList("connected");
-                _connectionIndicator.RemoveFromClassList("disconnected");
-                _connectionIndicator.RemoveFromClassList("error");
 
                 var dotClass = arm.Connection switch
                 {
@@ -64,10 +62,21 @@ namespace FPT.UI
                     DeviceConnectionState.Error => "error",
                     _ => "disconnected",
                 };
-                _connectionIndicator.AddToClassList(dotClass);
+
+                ApplyStateClass(_connectionIndicator, dotClass);
+                ApplyStateClass(_connectionPill, dotClass);
 
                 // 模式状态由控制面板 ModeHintLabel / PlanStatusLabel 展示
             }
+        }
+
+        private static void ApplyStateClass(VisualElement element, string stateClass)
+        {
+            if (element == null) return;
+            element.RemoveFromClassList("connected");
+            element.RemoveFromClassList("disconnected");
+            element.RemoveFromClassList("error");
+            element.AddToClassList(stateClass);
         }
 
         private System.Collections.IEnumerator FpsUpdateLoop()
@@ -76,7 +85,7 @@ namespace FPT.UI
             {
                 yield return new WaitForSeconds(0.5f);
                 var fps = (int)(1f / Time.unscaledDeltaTime);
-                _fpsLabel.text = $"FPS: {fps}";
+                _fpsLabel.text = $"FPS {fps}";
             }
         }
 

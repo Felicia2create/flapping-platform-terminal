@@ -85,7 +85,7 @@ namespace FPT.UI
             {
                 var idx = JointIndexFromName(arm.JointNames[i]);
                 if (idx >= 0 && idx < 6 && _jointLabels[idx] != null)
-                    _jointLabels[idx].text = $"Joint{idx + 1}: {arm.JointAngles[i]:F1}°";
+                    _jointLabels[idx].text = $"{arm.JointAngles[i]:F1}°";
             }
 
             // 转台
@@ -93,16 +93,16 @@ namespace FPT.UI
             {
                 var plateIdx = System.Array.FindIndex(arm.JointNames, n => n.Contains("plate"));
                 if (plateIdx >= 0)
-                    _turntableAngle.text = $"转台: {arm.JointAngles[plateIdx]:F1}°";
+                    _turntableAngle.text = $"{arm.JointAngles[plateIdx]:F1}°";
             }
 
             var p = arm.EndEffectorPose;
-            SetLabel(_posX, $"X: {p.X:F3}");
-            SetLabel(_posY, $"Y: {p.Y:F3}");
-            SetLabel(_posZ, $"Z: {p.Z:F3}");
-            SetLabel(_rotR, $"R: {p.Roll:F1}");
-            SetLabel(_rotP, $"P: {p.Pitch:F1}");
-            SetLabel(_rotY, $"Y: {p.Yaw:F1}");
+            SetLabel(_posX, $"{p.X:F3}");
+            SetLabel(_posY, $"{p.Y:F3}");
+            SetLabel(_posZ, $"{p.Z:F3}");
+            SetLabel(_rotR, $"{p.Roll:F1}");
+            SetLabel(_rotP, $"{p.Pitch:F1}");
+            SetLabel(_rotY, $"{p.Yaw:F1}");
         }
 
         private void OnTargetJointAngles(double[] angles)

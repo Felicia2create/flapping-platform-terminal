@@ -1,0 +1,14 @@
+{
+  "name": "Unity.Robotics.ROSTCPConnector.MessageGeneration",
+  "rootNamespace": "Unity.Robotics.ROSTCPConnector.MessageGeneration",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

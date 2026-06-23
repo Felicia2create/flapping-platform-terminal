@@ -14,7 +14,7 @@
 }
 
 .joint-name {
-    font-size: 17px;
+    font-size: 15px;
     color: var(--color-accent);
     width: 48px;
     -unity-font-style: bold;
@@ -49,17 +49,38 @@
 }
 
 .joint-value-input {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--color-accent);
     -unity-font-style: bold;
     width: 68px;
     height: 36px;
 }
 
-.joint-value-input .unity-base-text-field__input {
-    font-size: 16px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+/* === 右侧输入框统一样式：浅蓝圆角矩形（关节值 / 末端位姿 / 参考系下拉） === */
+.joint-value-input .unity-base-text-field__input,
+.ee-input .unity-base-text-field__input,
+.frame-selector .unity-base-popup-field__input,
+.frame-selector .unity-base-field__input {
+    font-size: 15px;
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 6px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    -unity-text-align: middle-center;
+}
+
+.joint-value-input .unity-base-text-field__input:focus,
+.ee-input .unity-base-text-field__input:focus,
+.frame-selector .unity-base-popup-field__input:focus,
+.frame-selector .unity-base-field__input:focus {
+    background-color: rgb(255, 255, 255);
+    border-color: var(--color-accent);
 }
 
 .joint-unit {
@@ -87,8 +108,8 @@
 }
 
 .pose-value {
-    font-size: var(--font-size-sm);
-    color: var(--color-text);
+    font-size: 16px;
+    color: var(--color-accent);
     margin-left: 4px;
     padding: 1px 0;
 }
