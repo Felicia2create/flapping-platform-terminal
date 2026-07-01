@@ -2,12 +2,18 @@ using UnityEngine;
 
 namespace FPT.Visualization
 {
-    /// <summary>
-    /// 轨道相机控制器 — 围绕目标旋转/缩放/平移
-    /// 与 UI Toolkit 配合：通过 _activeArea 限制只在 CenterView 区域内响应输入
-    /// </summary>
-    public class OrbitCameraController : MonoBehaviour
-    {
+        /// <summary>
+        /// 轨道相机控制器 — 围绕目标旋转/缩放/平移
+        /// 与 UI Toolkit 配合：通过 _activeArea 限制只在 CenterView 区域内响应输入
+        /// 与 CinemachineDollyManager 配合：通过 IsPaused 暂停输入处理，将控制权交给 Dolly 运镜
+        /// </summary>
+        public class OrbitCameraController : MonoBehaviour
+        {
+            /// <summary>
+            /// 暂停标志。为 true 时，LateUpdate 中跳过所有输入处理和相机变换。
+            /// 由 CinemachineDollyManager 在 Dolly 模式下设为 true，手动模式下设为 false。
+            /// </summary>
+            public bool IsPaused { get; set; }
         [Header("目标")]
         [SerializeField] private Transform _target;
         [SerializeField] private Vector3 _targetOffset = Vector3.zero;
@@ -72,6 +78,9 @@ namespace FPT.Visualization
 
         private void LateUpdate()
         {
+            // 当 Cinemachine Dolly 模式激活时，暂停所有输入处理
+            if (IsPaused) return;
+
             HandleInput();
             SmoothValues();
             ApplyTransform();
