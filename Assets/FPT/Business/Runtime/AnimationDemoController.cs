@@ -20,10 +20,14 @@ namespace FPT.Business
         [SerializeField] private int _armCount = 1;
         [SerializeField] private float _phaseOffset = 0f;
 
+        [Header("阵型模式（每臂独立轨迹，优先级高于单轨迹 + 相位偏移）")]
+        [SerializeField] private TextAsset[] _perArmTrajectoryJsons = new TextAsset[3];
+
         [Header("设置")]
         [SerializeField] private float _playbackSpeed = 1.0f;
 
         private AnimationTrajectoryData _data;
+        private AnimationTrajectoryData[] _perArmData;
 
         public bool IsArmPlaying { get; private set; }
         public bool IsArmPaused { get; private set; }
@@ -90,6 +94,14 @@ namespace FPT.Business
             for (int i = 0; i < known.Length; i++)
                 if (_paths[i] == null)
                     _paths[i] = Resources.Load<TextAsset>($"Trajectories/{known[i]}");
+
+            // 阵型模式：自动加载每臂独立轨迹（如果 Inspector 未手动配置）
+            if (_perArmTrajectoryJsons == null || _perArmTrajectoryJsons.Length < 3)
+                _perArmTrajectoryJsons = new TextAsset[3];
+            string[] armKnown = { "breathing_arm1", "breathing_arm2", "breathing_arm3" };
+            for (int i = 0; i < 3; i++)
+                if (_perArmTrajectoryJsons[i] == null)
+                    _perArmTrajectoryJsons[i] = Resources.Load<TextAsset>($"Trajectories/{armKnown[i]}");
         }
 
         /// <summary> 切换到第 index 条路径（0-3），由 UI 路径按钮调用 </summary>
@@ -173,22 +185,52 @@ namespace FPT.Business
         public void PlayArm()
         {
             _plateActive = true;
+
+            // 尝试解析阵型模式（每臂独立轨迹）
+            _perArmData = null;
+            bool hasPerArm = true;
+            for (int i = 0; i < 3; i++)
+            {
+                if (_perArmTrajectoryJsons == null || i >= _perArmTrajectoryJsons.Length || _perArmTrajectoryJsons[i] == null)
+                {
+                    hasPerArm = false;
+                    break;
+                }
+            }
+            if (hasPerArm)
+            {
+                _perArmData = new AnimationTrajectoryData[3];
+                for (int i = 0; i < 3; i++)
+                {
+                    _perArmData[i] = JsonUtility.FromJson<AnimationTrajectoryData>(_perArmTrajectoryJsons[i].text);
+                    if (_perArmData[i] == null || _perArmData[i].points == null || _perArmData[i].points.Length == 0)
+                    {
+                        Debug.LogWarning($"[AnimationDemo] 阵型轨迹 arm{i + 1} 解析失败，回退到单轨迹模式");
+                        _perArmData = null;
+                        hasPerArm = false;
+                        break;
+                    }
+                }
+                if (hasPerArm)
+                    Debug.Log("[AnimationDemo] 阵型模式激活：3 臂独立轨迹");
+            }
+
             if (_data == null || _data.points == null || _data.points.Length == 0)
             {
-                Debug.LogWarning("[AnimationDemo] 无轨迹数据，仅转台旋转");
+                if (!hasPerArm)
+                    Debug.LogWarning("[AnimationDemo] 无轨迹数据，仅转台旋转");
             }
-            else
-            {
-                // 初始化每个臂的独立计时器 + 相位偏移
-                _elapsedPerArm = new float[_armCount];
-                float cycle = _data.cycle_duration_sec;
-                float step = _phaseOffset > 0f ? _phaseOffset : (cycle / _armCount);
-                for (int i = 0; i < _armCount; i++)
-                    _elapsedPerArm[i] = step * i;
 
-                IsArmPlaying = true;
-                IsArmPaused = false;
-            }
+            // 初始化每个臂的独立计时器
+            int armCount = hasPerArm ? 3 : _armCount;
+            _elapsedPerArm = new float[armCount];
+            float cycle = hasPerArm ? _perArmData[0].cycle_duration_sec : _data.cycle_duration_sec;
+            float step = _phaseOffset > 0f ? _phaseOffset : (cycle / armCount);
+            for (int i = 0; i < armCount; i++)
+                _elapsedPerArm[i] = step * i;
+
+            IsArmPlaying = true;
+            IsArmPaused = false;
             OnArmPlayStateChanged?.Invoke(true);
         }
 
@@ -243,22 +285,33 @@ namespace FPT.Business
             }
 
             // 机械臂：Play 后才动
-            if (!IsArmPlaying || _data == null || _data.points == null) return;
+            if (!IsArmPlaying) return;
+
+            bool usePerArm = _perArmData != null;
+            if (!usePerArm && (_data == null || _data.points == null)) return;
+
+            float cycleDuration = usePerArm ? _perArmData[0].cycle_duration_sec : _data.cycle_duration_sec;
+            int driveArmCount = usePerArm ? _perArmData.Length : _armCount;
 
             _elapsed += Time.deltaTime * _playbackSpeed;
-            if (_elapsed >= _data.cycle_duration_sec)
-                _elapsed -= _data.cycle_duration_sec;
-            ArmProgress = Mathf.Clamp01(_elapsed / _data.cycle_duration_sec);
+            if (_elapsed >= cycleDuration)
+                _elapsed -= cycleDuration;
+            ArmProgress = Mathf.Clamp01(_elapsed / cycleDuration);
 
-            // 驱动每个臂（相位偏移）
+            // 驱动每个臂
             double[] displayAngles = null;
-            for (int arm = 0; arm < _armCount; arm++)
+            for (int arm = 0; arm < driveArmCount; arm++)
             {
                 _elapsedPerArm[arm] += Time.deltaTime * _playbackSpeed;
-                if (_elapsedPerArm[arm] >= _data.cycle_duration_sec)
-                    _elapsedPerArm[arm] -= _data.cycle_duration_sec;
+                if (_elapsedPerArm[arm] >= cycleDuration)
+                    _elapsedPerArm[arm] -= cycleDuration;
 
-                var angles = InterpolateArm(_elapsedPerArm[arm]);
+                double[] angles;
+                if (usePerArm)
+                    angles = InterpolateArmWith(_elapsedPerArm[arm], _perArmData[arm]);
+                else
+                    angles = InterpolateArm(_elapsedPerArm[arm]);
+
                 if (arm == 0) displayAngles = angles;
                 _animPlatform.SendMessage($"SetArm{arm + 1}Angles", angles);
             }
@@ -300,6 +353,17 @@ namespace FPT.Business
         private double[] InterpolateArm(float time)
         {
             var pts = _data.points;
+            return InterpolatePoints(time, pts);
+        }
+
+        private double[] InterpolateArmWith(float time, AnimationTrajectoryData trajData)
+        {
+            var pts = trajData.points;
+            return InterpolatePoints(time, pts);
+        }
+
+        private static double[] InterpolatePoints(float time, TrajectoryPoint[] pts)
+        {
             if (pts.Length == 0) return new double[6];
 
             if (time <= pts[0].t) return RadToDeg(pts[0].positions_rad);
