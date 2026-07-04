@@ -6293,7 +6293,7 @@ MonoBehaviour:
   _targetArms: 010000000200000003000000
   _trailColor: {r: 0, g: 1, b: 1, a: 1}
   _trailWidth: 0.02
-  _trailTime: 10
+  _trailTime: 3
   _trailMaterial: {fileID: 0}
 --- !u!1001 &1673917949
 PrefabInstance:
