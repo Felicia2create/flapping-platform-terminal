@@ -14,7 +14,7 @@ namespace FPT.UI
         private readonly Label _statusLabel;
         private readonly Label _speedValueLabel;
         private readonly Label _plateSpeedValueLabel;
-        private readonly Button[] _pathButtons = new Button[4];
+        private readonly Button[] _pathButtons = new Button[1];
 
         // 机械臂关节实时回显
         private readonly Label[] _jointLabels = new Label[6];

@@ -218,10 +218,7 @@
                 <ui:VisualElement class="control-section">
                     <ui:Label text="路径选择" class="section-title" />
                     <ui:VisualElement name="PathList" class="path-list">
-                        <ui:Button name="PathButton0" text="路径 1 · 8 字循环" class="path-button path-active" />
-                        <ui:Button name="PathButton1" text="路径 2 · 上下扑动" class="path-button" />
-                        <ui:Button name="PathButton2" text="路径 3 · 圆周轨迹" class="path-button" />
-                        <ui:Button name="PathButton3" text="路径 4 · 自定义" class="path-button" />
+                        <ui:Button name="PathButton0" text="路径 1 · 上下扑动" class="path-button path-active" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section">
