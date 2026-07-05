@@ -97,12 +97,12 @@ namespace FPT.UI
             }
 
             var p = arm.EndEffectorPose;
-            SetLabel(_posX, $"{p.X:F3}");
-            SetLabel(_posY, $"{p.Y:F3}");
-            SetLabel(_posZ, $"{p.Z:F3}");
-            SetLabel(_rotR, $"{p.Roll:F1}");
-            SetLabel(_rotP, $"{p.Pitch:F1}");
-            SetLabel(_rotY, $"{p.Yaw:F1}");
+            SetLabel(_posX, DevicePose.FormatComponent(p.X, 3));
+            SetLabel(_posY, DevicePose.FormatComponent(p.Y, 3));
+            SetLabel(_posZ, DevicePose.FormatComponent(p.Z, 3));
+            SetLabel(_rotR, DevicePose.FormatComponent(p.Roll, 3));
+            SetLabel(_rotP, DevicePose.FormatComponent(p.Pitch, 3));
+            SetLabel(_rotY, DevicePose.FormatComponent(p.Yaw, 3));
         }
 
         private void OnTargetJointAngles(double[] angles)
@@ -116,12 +116,12 @@ namespace FPT.UI
 
         private void OnTargetEePose(DevicePose pose)
         {
-            SetLabel(_targetPosX, $"X: {pose.X:F3}");
-            SetLabel(_targetPosY, $"Y: {pose.Y:F3}");
-            SetLabel(_targetPosZ, $"Z: {pose.Z:F3}");
-            SetLabel(_targetRotR, $"R: {pose.Roll:F1}");
-            SetLabel(_targetRotP, $"P: {pose.Pitch:F1}");
-            SetLabel(_targetRotY, $"Y: {pose.Yaw:F1}");
+            SetLabel(_targetPosX, $"X: {DevicePose.FormatComponent(pose.X, 3)}");
+            SetLabel(_targetPosY, $"Y: {DevicePose.FormatComponent(pose.Y, 3)}");
+            SetLabel(_targetPosZ, $"Z: {DevicePose.FormatComponent(pose.Z, 3)}");
+            SetLabel(_targetRotR, $"R: {DevicePose.FormatComponent(pose.Roll, 3)}");
+            SetLabel(_targetRotP, $"P: {DevicePose.FormatComponent(pose.Pitch, 3)}");
+            SetLabel(_targetRotY, $"Y: {DevicePose.FormatComponent(pose.Yaw, 3)}");
         }
 
         private static void SetLabel(Label label, string text)

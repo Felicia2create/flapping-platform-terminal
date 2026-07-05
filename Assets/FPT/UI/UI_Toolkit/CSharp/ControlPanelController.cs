@@ -77,6 +77,14 @@ namespace FPT.UI
             _eeYaw = root.Q<FloatField>("EeInputYaw");
             _frameSelector = root.Q<DropdownField>("FrameSelector");
 
+            // 设置显示格式：避免极小值（如 0.4555e-14）以科学计数法显示
+            SetFloatFieldFormat(_eeX, 3);
+            SetFloatFieldFormat(_eeY, 3);
+            SetFloatFieldFormat(_eeZ, 3);
+            SetFloatFieldFormat(_eeRoll, 3);
+            SetFloatFieldFormat(_eePitch, 3);
+            SetFloatFieldFormat(_eeYaw, 3);
+
             // EE 字段变化 → 标记待发送（去抖）
             BindEeField(_eeX); BindEeField(_eeY); BindEeField(_eeZ);
             BindEeField(_eeRoll); BindEeField(_eePitch); BindEeField(_eeYaw);
@@ -155,6 +163,15 @@ namespace FPT.UI
             field.RegisterValueChangedCallback(_ => ScheduleEeSend());
         }
 
+        /// <summary>
+        /// 设置 FloatField 显示格式，避免极小值以科学计数法显示
+        /// </summary>
+        private static void SetFloatFieldFormat(FloatField field, int decimals)
+        {
+            if (field == null) return;
+            field.formatString = $"F{decimals}";
+        }
+
         private void ScheduleEeSend()
         {
             _pendingEePose = new DevicePose(
@@ -190,13 +207,13 @@ namespace FPT.UI
 
         private void OnTerminalEePose(DevicePose pose)
         {
-            // FK 返回 → 更新 EE 字段
-            if (_eeX != null) _eeX.SetValueWithoutNotify(pose.X);
-            if (_eeY != null) _eeY.SetValueWithoutNotify(pose.Y);
-            if (_eeZ != null) _eeZ.SetValueWithoutNotify(pose.Z);
-            if (_eeRoll != null) _eeRoll.SetValueWithoutNotify(pose.Roll);
-            if (_eePitch != null) _eePitch.SetValueWithoutNotify(pose.Pitch);
-            if (_eeYaw != null) _eeYaw.SetValueWithoutNotify(pose.Yaw);
+            // FK 返回 → 更新 EE 字段（极小值归零，避免科学计数法显示）
+            if (_eeX != null) _eeX.SetValueWithoutNotify(DevicePose.ClampTinyValue(pose.X, 3));
+            if (_eeY != null) _eeY.SetValueWithoutNotify(DevicePose.ClampTinyValue(pose.Y, 3));
+            if (_eeZ != null) _eeZ.SetValueWithoutNotify(DevicePose.ClampTinyValue(pose.Z, 3));
+            if (_eeRoll != null) _eeRoll.SetValueWithoutNotify(DevicePose.ClampTinyValue(pose.Roll, 3));
+            if (_eePitch != null) _eePitch.SetValueWithoutNotify(DevicePose.ClampTinyValue(pose.Pitch, 3));
+            if (_eeYaw != null) _eeYaw.SetValueWithoutNotify(DevicePose.ClampTinyValue(pose.Yaw, 3));
         }
 
         private void OnTerminalStatus(string status)

@@ -43,5 +43,31 @@ namespace FPT.Core
             => $"Pos({X:F3}, {Y:F3}, {Z:F3}) RPY({Roll:F1}, {Pitch:F1}, {Yaw:F1})";
 
         public static DevicePose Identity => new DevicePose(0, 0, 0, 0, 0, 0);
+
+        /// <summary>
+        /// 格式化单个位姿分量显示值：|value| &lt; threshold 时归零，最多保留 decimals 位小数
+        /// 避免 ROS2 传回的极小值（如 0.4555e-14）以科学计数法显示
+        /// </summary>
+        /// <param name="value">原始浮点值</param>
+        /// <param name="decimals">小数位数（位置 3，姿态 1）</param>
+        /// <returns>格式化后的字符串，如 "0.000" 或 "1.234"</returns>
+        public static string FormatComponent(float value, int decimals)
+        {
+            float threshold = Mathf.Pow(10f, -decimals) * 0.5f;
+            float display = Mathf.Abs(value) < threshold ? 0f : value;
+            return display.ToString($"F{decimals}");
+        }
+
+        /// <summary>
+        /// 将低于显示阈值的极小值归零（直接用于 FloatField 等控件）
+        /// </summary>
+        /// <param name="value">原始浮点值</param>
+        /// <param name="decimals">小数位数（位置 3，姿态 1）</param>
+        /// <returns>归零或原值</returns>
+        public static float ClampTinyValue(float value, int decimals)
+        {
+            float threshold = Mathf.Pow(10f, -decimals) * 0.5f;
+            return Mathf.Abs(value) < threshold ? 0f : value;
+        }
     }
 }

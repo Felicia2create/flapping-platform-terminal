@@ -46,7 +46,9 @@ namespace FPT.Business
         private float[] _elapsedPerArm;
 
         private MeshRenderer[] _realRenderers;
-        private MeshRenderer[] _animRenderers;
+        private Renderer[] _animRenderers;
+        private LineRenderer[] _animLineRenderers;
+        private TrailRenderer[] _animTrailRenderers;
 
         public AnimationTrajectoryData TrajectoryData => _data;
 
@@ -75,9 +77,22 @@ namespace FPT.Business
                 _realPlatformRoot = GameObject.Find("flapping_platform");
 
             _realRenderers = _realPlatformRoot?.GetComponentsInChildren<MeshRenderer>() ?? new MeshRenderer[0];
-            _animRenderers = _animPlatformRoot?.GetComponentsInChildren<MeshRenderer>() ?? new MeshRenderer[0];
+            // 收集 AnimationPlatform 下所有渲染组件
+            _animRenderers = _animPlatformRoot?.GetComponentsInChildren<Renderer>() ?? new Renderer[0];
+            _animLineRenderers = _animPlatformRoot?.GetComponentsInChildren<LineRenderer>() ?? new LineRenderer[0];
+            _animTrailRenderers = _animPlatformRoot?.GetComponentsInChildren<TrailRenderer>() ?? new TrailRenderer[0];
 
+            // 默认隐藏动画相关元素：控制面板模式下不可见
             SetRenderersEnabled(_animRenderers, false);
+            SetLineRenderersEnabled(_animLineRenderers, false);
+            SetTrailRenderersEnabled(_animTrailRenderers, false);
+        }
+
+        private System.Collections.IEnumerator Start()
+        {
+            // 等待一帧，确保 AnimationPlatformController.Start() 已完成关节发现
+            yield return null;
+            ApplyInitialPose();
         }
 
         private void ResolvePaths()
@@ -163,6 +178,9 @@ namespace FPT.Business
         {
             SetRenderersEnabled(_realRenderers, false);
             SetRenderersEnabled(_animRenderers, true);
+            SetLineRenderersEnabled(_animLineRenderers, true);
+            SetTrailRenderersEnabled(_animTrailRenderers, true);
+            _animPlatformRoot?.BroadcastMessage("SetTrailsEnabled", true, SendMessageOptions.DontRequireReceiver);
         }
 
         public void Deactivate()
@@ -170,9 +188,30 @@ namespace FPT.Business
             PauseArm();
             SetRenderersEnabled(_realRenderers, true);
             SetRenderersEnabled(_animRenderers, false);
+            SetLineRenderersEnabled(_animLineRenderers, false);
+            SetTrailRenderersEnabled(_animTrailRenderers, false);
+            _animPlatformRoot?.BroadcastMessage("SetTrailsEnabled", false, SendMessageOptions.DontRequireReceiver);
         }
 
         private static void SetRenderersEnabled(MeshRenderer[] renderers, bool enabled)
+        {
+            foreach (var r in renderers)
+                if (r != null) r.enabled = enabled;
+        }
+
+        private static void SetRenderersEnabled(Renderer[] renderers, bool enabled)
+        {
+            foreach (var r in renderers)
+                if (r != null) r.enabled = enabled;
+        }
+
+        private static void SetLineRenderersEnabled(LineRenderer[] renderers, bool enabled)
+        {
+            foreach (var r in renderers)
+                if (r != null) r.enabled = enabled;
+        }
+
+        private static void SetTrailRenderersEnabled(TrailRenderer[] renderers, bool enabled)
         {
             foreach (var r in renderers)
                 if (r != null) r.enabled = enabled;
@@ -267,6 +306,25 @@ namespace FPT.Business
             for (int i = 0; i < 6 && i < pt.positions_rad.Length; i++)
                 a[i] = pt.positions_rad[i] * Mathf.Rad2Deg;
             return a;
+        }
+
+        /// <summary>
+        /// 启动时将机械臂设置到轨迹初始姿态，避免显示默认静止姿态
+        /// </summary>
+        private void ApplyInitialPose()
+        {
+            if (_animPlatform == null) return;
+
+            var wp0 = _data?.points?[0];
+            if (wp0 == null) return;
+
+            int armCount = Mathf.Max(_armCount, 1);
+            var initAngles = GetAnglesFromPoint(wp0);
+
+            for (int arm = 1; arm <= armCount; arm++)
+                _animPlatform.SendMessage($"SetArm{arm}Angles", initAngles);
+
+            Debug.Log($"[AnimationDemo] 启动初始化：{armCount} 臂已对齐轨迹初始姿态");
         }
 
         // ═══════════════════════════════════════════
