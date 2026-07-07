@@ -103,6 +103,18 @@ namespace FPT.UI
                 Debug.LogWarning("[MainView] 场景中未找到 GhostArmController，预览机械臂不可用");
             }
 
+            // ── 查找场景中预置的 FormationVisualizer 并注入依赖 ──
+            var formationVis = FindObjectOfType<FormationVisualizer>();
+            if (formationVis != null)
+            {
+                formationVis.Bind(_ctx.AnimationDemo);
+                Debug.Log("[MainView] FormationVisualizer 已绑定 AnimationDemoController");
+            }
+            else
+            {
+                Debug.LogWarning("[MainView] 场景中未找到 FormationVisualizer，阵型连线不可用");
+            }
+
             // 绑定 3D 相机
             SetupCamera();
 

@@ -1,18 +1,19 @@
+using FPT.Business;
 using UnityEngine;
 
 namespace FPT.Visualization
 {
     /// <summary>
-    /// 阵型可视化器 — 在 3 只仿真鸟之间绘制闭合三角形连线。
+    /// 动态阵型可视化器 — 根据当前动画模式切换连线拓扑。
     ///
-    /// 功能：
-    ///   - 使用 LineRenderer 在 3 个目标之间绘制发光三角形
-    ///   - 运行时自动创建 URP 兼容的 Emission 发光材质（科技蓝）
-    ///   - 支持半透明效果
+    /// 三种连线模式：
+    ///   - Breathing（呼吸聚散）: 闭合三角形（Arm1→Arm2→Arm3→Arm1）
+    ///   - SequentialWave（波浪接力）: 开口折线（Arm1→Arm2→Arm3）
+    ///   - Lissajous（8字轨迹）: 星型拓扑（Center→Arm1→Center→Arm2→Center→Arm3）
     ///
     /// 架构约束：
     ///   - 所有目标引用通过 Inspector 拖拽赋值，禁止使用 GameObject.Find
-    ///   - 仅依赖 UnityEngine，不引用业务层
+    ///   - AnimationDemoController 通过 Bind() 注入
     /// </summary>
     [RequireComponent(typeof(LineRenderer))]
     public class FormationVisualizer : MonoBehaviour
@@ -35,11 +36,30 @@ namespace FPT.Visualization
         [Tooltip("如果为 true，连线点会上移到目标的 Y + offset")]
         [SerializeField] private float _verticalOffset = 0f;
 
+        [Header("星型拓扑设置")]
+        [Tooltip("星型模式下中心点的垂直偏移")]
+        [SerializeField] private float _centerYOffset = 0.05f;
+
+        // ═══════════════════════════════════════════
+        // 依赖注入
+        // ═══════════════════════════════════════════
+
+        private AnimationDemoController _demo;
+
+        /// <summary>
+        /// 由外部注入 AnimationDemoController 引用，使可视化器能感知当前模式。
+        /// </summary>
+        public void Bind(AnimationDemoController demo)
+        {
+            _demo = demo;
+        }
+
         // ═══════════════════════════════════════════
         // 内部状态
         // ═══════════════════════════════════════════
 
         private LineRenderer _lineRenderer;
+        private DemoFormationMode _lastMode = (DemoFormationMode)(-1); // 强制首次刷新
 
         // ═══════════════════════════════════════════
         // 生命周期
@@ -53,6 +73,13 @@ namespace FPT.Visualization
 
         private void LateUpdate()
         {
+            // 如果模式发生变化，重新配置 LineRenderer
+            if (_demo != null && _demo.CurrentMode != _lastMode)
+            {
+                _lastMode = _demo.CurrentMode;
+                ReconfigureForMode(_lastMode);
+            }
+
             UpdateVertices();
         }
 
@@ -62,9 +89,9 @@ namespace FPT.Visualization
 
         private void ConfigureLineRenderer()
         {
-            // 闭合三角形：4 个点（首尾重合）
-            _lineRenderer.positionCount = 4;
-            _lineRenderer.loop = false; // 手动闭合，避免 LineRenderer 自动插值
+            // 默认最大 6 个点（星型拓扑需要最多）
+            _lineRenderer.positionCount = 6;
+            _lineRenderer.loop = false;
             _lineRenderer.useWorldSpace = true;
             _lineRenderer.startWidth = _lineWidth;
             _lineRenderer.endWidth = _lineWidth;
@@ -78,6 +105,37 @@ namespace FPT.Visualization
         }
 
         // ═══════════════════════════════════════════
+        // 模式切换
+        // ═══════════════════════════════════════════
+
+        private void ReconfigureForMode(DemoFormationMode mode)
+        {
+            switch (mode)
+            {
+                case DemoFormationMode.Breathing:
+                    // 闭合三角形：4 个点（Arm1→Arm2→Arm3→Arm1）
+                    _lineRenderer.positionCount = 4;
+                    _lineRenderer.startColor = _lineColor;
+                    _lineRenderer.endColor = _lineColor;
+                    break;
+
+                case DemoFormationMode.SequentialWave:
+                    // 开口折线：3 个点（Arm1→Arm2→Arm3）
+                    _lineRenderer.positionCount = 3;
+                    _lineRenderer.startColor = _lineColor;
+                    _lineRenderer.endColor = _lineColor;
+                    break;
+
+                case DemoFormationMode.Lissajous:
+                    // 星型拓扑：6 个点（Center→Arm1→Center→Arm2→Center→Arm3）
+                    _lineRenderer.positionCount = 6;
+                    _lineRenderer.startColor = _lineColor;
+                    _lineRenderer.endColor = _lineColor;
+                    break;
+            }
+        }
+
+        // ═══════════════════════════════════════════
         // 顶点更新
         // ═══════════════════════════════════════════
 
@@ -85,22 +143,71 @@ namespace FPT.Visualization
         {
             if (_targets == null || _targets.Length < 3) return;
 
+            // 获取 3 个目标位置
+            Vector3[] positions = new Vector3[3];
             for (int i = 0; i < 3; i++)
             {
-                if (_targets[i] == null) continue;
-
-                Vector3 pos = _targets[i].position;
-                pos.y += _verticalOffset;
-                _lineRenderer.SetPosition(i, pos);
+                if (_targets[i] == null) return;
+                positions[i] = _targets[i].position;
+                positions[i].y += _verticalOffset;
             }
 
-            // 闭合：第 4 个点 = 第 1 个点
-            if (_targets[0] != null)
+            DemoFormationMode mode = _demo != null ? _demo.CurrentMode : DemoFormationMode.Breathing;
+
+            switch (mode)
             {
-                Vector3 pos = _targets[0].position;
-                pos.y += _verticalOffset;
-                _lineRenderer.SetPosition(3, pos);
+                case DemoFormationMode.Breathing:
+                    DrawClosedTriangle(positions);
+                    break;
+
+                case DemoFormationMode.SequentialWave:
+                    DrawOpenPolyline(positions);
+                    break;
+
+                case DemoFormationMode.Lissajous:
+                    DrawStarTopology(positions);
+                    break;
             }
+        }
+
+        /// <summary>
+        /// 呼吸聚散 — 闭合三角形：Arm1→Arm2→Arm3→Arm1
+        /// </summary>
+        private void DrawClosedTriangle(Vector3[] p)
+        {
+            _lineRenderer.SetPosition(0, p[0]);
+            _lineRenderer.SetPosition(1, p[1]);
+            _lineRenderer.SetPosition(2, p[2]);
+            _lineRenderer.SetPosition(3, p[0]); // 闭合回第 1 个点
+        }
+
+        /// <summary>
+        /// 波浪接力 — 开口折线：Arm1→Arm2→Arm3
+        /// </summary>
+        private void DrawOpenPolyline(Vector3[] p)
+        {
+            _lineRenderer.SetPosition(0, p[0]);
+            _lineRenderer.SetPosition(1, p[1]);
+            _lineRenderer.SetPosition(2, p[2]);
+        }
+
+        /// <summary>
+        /// 8字轨迹 — 星型拓扑：Center→Arm1→Center→Arm2→Center→Arm3
+        /// 像雷达锁定目标一样的放射状连线。
+        /// </summary>
+        private void DrawStarTopology(Vector3[] p)
+        {
+            // 计算 3 个臂的几何中心
+            Vector3 center = (p[0] + p[1] + p[2]) / 3f;
+            center.y += _centerYOffset;
+
+            // 放射状连线：中心→Arm1→中心→Arm2→中心→Arm3
+            _lineRenderer.SetPosition(0, center);
+            _lineRenderer.SetPosition(1, p[0]);
+            _lineRenderer.SetPosition(2, center);
+            _lineRenderer.SetPosition(3, p[1]);
+            _lineRenderer.SetPosition(4, center);
+            _lineRenderer.SetPosition(5, p[2]);
         }
 
         // ═══════════════════════════════════════════
