@@ -25,7 +25,8 @@ namespace FPT.UI
 
         // 模式下拉菜单（中文）
         private readonly DropdownField _modeSelector;
-        private static readonly List<string> _modeOptions = new List<string> { "波浪接力", "呼吸聚散", "8字轨迹" };
+        // private static readonly List<string> _modeOptions = new List<string> { "波浪接力", "呼吸聚散", "8字轨迹" };
+                private static readonly List<string> _modeOptions = new List<string> { "波浪接力", "呼吸聚散", "8字轨迹", "人字形", "Y字形" };
 
         // 机械臂关节实时回显
         private readonly Label[] _jointLabels = new Label[6];
@@ -42,22 +43,26 @@ namespace FPT.UI
         private bool _suppressCallbacks;
 
         // ── 中文 ↔ 枚举映射 ──
-
         private static int GetModeIndex(DemoFormationMode mode) => mode switch
         {
             DemoFormationMode.SequentialWave => 0,
             DemoFormationMode.Breathing      => 1,
             DemoFormationMode.Lissajous      => 2,
+            DemoFormationMode.VShape         => 3,
+            DemoFormationMode.YShape         => 4,
             _ => 0
-        };
+        };      
 
         private static DemoFormationMode GetModeFromIndex(int index) => index switch
         {
             0 => DemoFormationMode.SequentialWave,
             1 => DemoFormationMode.Breathing,
             2 => DemoFormationMode.Lissajous,
+            3 => DemoFormationMode.VShape,
+            4 => DemoFormationMode.YShape,
             _ => DemoFormationMode.SequentialWave
         };
+        
 
         public AnimationPageController(VisualElement root, AnimationDemoController demo)
         {

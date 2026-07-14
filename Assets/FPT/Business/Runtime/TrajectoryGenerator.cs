@@ -12,7 +12,9 @@ namespace FPT.Business
         /// <summary>呼吸聚散 — 三臂同步向外展开、向内收缩</summary>
         Breathing,
         /// <summary>8字轨迹 — Lissajous 曲线，末端画 8 字</summary>
-        Lissajous
+        Lissajous,
+        VShape,   // 新增V型阵型
+        YShape    // 新增Y型阵型
     }
 
     /// <summary>
@@ -32,13 +34,16 @@ namespace FPT.Business
         /// <returns>6 个关节角度（度）</returns>
         public static double[] GetJointAngles(DemoFormationMode mode, float time, int armIndex, float amplitude, float baseFreq)
         {
-            return mode switch
+             return mode switch
             {
                 DemoFormationMode.SequentialWave => GenerateSequentialWave(time, armIndex, amplitude, baseFreq),
                 DemoFormationMode.Breathing       => GenerateBreathing(time, armIndex, amplitude, baseFreq),
                 DemoFormationMode.Lissajous       => GenerateLissajous(time, armIndex, amplitude, baseFreq),
+                DemoFormationMode.VShape          => new double[6],
+                DemoFormationMode.YShape          => new double[6],
                 _ => new double[6]
             };
+            
         }
 
         // ═══════════════════════════════════════════

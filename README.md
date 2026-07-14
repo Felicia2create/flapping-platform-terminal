@@ -405,6 +405,35 @@ public class MyCustomCommand : IDeviceCommand
 
 参考 `Assets/UI_Toolkit_Development_Specification.md`，使用 UXML 定义布局，USS 定义样式。注意 UI Toolkit 与 HTML/CSS 有重要差异。
 
+
+
+## 📋 URDF分析
+
+### 1. URDF 结构分析
+
+ 项目中的AnimationPlatform路径下的arm1_base_link、arm2_base_link、arm3_base_link 机械臂 URDF 文件
+
+URDF 文件 [flapping_platform.urdf](file:///d:/vsqt/unity_file/flapping-platform-terminal/Assets/FPT/Visualization/Runtime/flapping_platform_prefabs/flapping_platform.urdf) 只定义了 **arm1**（arm1_base_link → arm1_link1~6），arm2 和 arm3 在 Unity 中是通过复制 arm1 并旋转 120° 放置的。
+
+关键参数：
+
+- 臂底座半径：**1.21704m**（从转台中心到每个臂底座）
+- 臂底座旋转：arm1 旋转 **180°**（π rad），arm2 旋转 **300°**（5π/3），arm3 旋转 **60°**（π/3）
+- 臂底座高度：**0.095m**（相对转台面）
+- 单臂最大伸展：约 **0.8~1.0m**
+
+### 2. 现有数据格式
+
+[AnimationTrajectoryData.cs](file:///d:/vsqt/unity_file/flapping-platform-terminal/Assets/FPT/Core/Runtime/Models/AnimationTrajectoryData.cs) 定义了轨迹格式，每个 `TrajectoryPoint` 包含 6 个关节的弧度值。
+
+### 3. 现有可视化
+
+[FormationVisualizer.cs](file:///d:/vsqt/unity_file/flapping-platform-terminal/Assets/FPT/Visualization/Runtime/Formation/FormationVisualizer.cs) 已支持三种连线模式（三角形、折线、星型），但需要添加 VShape 和 YShape 模式。
+
+
+
+
+
 ---
 
 > **FPT 开发团队** | 最后更新: 2026-06-03

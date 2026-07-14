@@ -1,12 +1,15 @@
 using UnityEngine;
 using FPT.Core;
+using Newtonsoft.Json;
+using System.Linq;
+
 namespace FPT.Business
 {
     /// <summary>
-    /// 动画演示控制器（参数化轨迹版）
+    /// 动画演示控制器（混合驱动版）
     ///
-    /// 废弃 JSON 驱动，改为实时数学演算。
-    /// 每帧根据 DemoFormationMode 调用 TrajectoryGenerator 生成 3 臂关节角度。
+    ///   - Breathing / SequentialWave / Lissajous：实时数学演算
+    ///   - VShape / YShape：离线 JSON 驱动（从 formation_trajectory.json 读取）
     /// </summary>
     public class AnimationDemoController : MonoBehaviour
     {
@@ -34,6 +37,15 @@ namespace FPT.Business
 
         [Header("转台")]
         [SerializeField] private float _plateSpeed = 0f;
+
+        [Header("JSON 轨迹（VShape / YShape 模式）")]
+        [SerializeField] private TextAsset _trajectoryJson;
+
+        // ═══════════════════════════════════════════
+        //  内部数据
+        // ═══════════════════════════════════════════
+
+        private AnimationTrajectoryData _trajectoryData;
 
         // ═══════════════════════════════════════════
         //  公共属性（供 Inspector / UI 使用）
@@ -130,6 +142,9 @@ namespace FPT.Business
             SetRenderersEnabled(_animRenderers, false);
             SetLineRenderersEnabled(_animLineRenderers, false);
             SetTrailRenderersEnabled(_animTrailRenderers, false);
+
+            // 解析离线 JSON 轨迹文件
+            ParseTrajectoryJson();
         }
 
         private System.Collections.IEnumerator Start()
@@ -223,7 +238,13 @@ namespace FPT.Business
         /// </summary>
         public void SelectPath(int index)
         {
-            var modes = new[] { DemoFormationMode.SequentialWave, DemoFormationMode.Breathing, DemoFormationMode.Lissajous };
+            var modes = new[] {
+                DemoFormationMode.SequentialWave,
+                DemoFormationMode.Breathing,
+                DemoFormationMode.Lissajous,
+                DemoFormationMode.VShape,
+                DemoFormationMode.YShape
+            };
             if (index >= 0 && index < modes.Length)
                 _currentMode = modes[index];
             StopArm();
@@ -236,14 +257,34 @@ namespace FPT.Business
         {
             if (_animPlatform == null) return;
 
-            // 使用 TrajectoryGenerator 获取初始角度（时间 t=0）
+            // ── JSON 驱动模式：从 JSON 读取初始姿态 ──
+            if (_currentMode == DemoFormationMode.VShape ||
+                _currentMode == DemoFormationMode.YShape)
+            {
+                if (_trajectoryData != null && _trajectoryData.PointCount > 0)
+                {
+                    var firstPoint = _trajectoryData.points[0];
+                    for (int arm = 1; arm <= 3; arm++)
+                    {
+                        var armData = firstPoint.GetArm(arm);
+                        if (armData?.positions_rad == null) continue;
+
+                        double[] degAngles = armData.positions_rad
+                            .Select(r => r * Mathf.Rad2Deg).ToArray();
+                        _animPlatform.SendMessage($"SetArm{arm}Angles", degAngles);
+                    }
+                    Debug.Log("[AnimationDemo] JSON 初始姿态已应用");
+                }
+                return;
+            }
+
+            // ── 实时演算模式：从 TrajectoryGenerator 获取初始姿态 ──
             const int armCount = 3;
             for (int arm = 0; arm < armCount; arm++)
             {
                 double[] radAngles = TrajectoryGenerator.GetJointAngles(
                     _currentMode, 0f, arm, _amplitude, _baseFrequency);
                 
-                // 转换为角度
                 double[] degAngles = new double[6];
                 for (int j = 0; j < 6; j++)
                     degAngles[j] = radAngles[j] * Mathf.Rad2Deg;
@@ -272,6 +313,15 @@ namespace FPT.Business
             // 机械臂：Play 后才动
             if (!IsArmPlaying) return;
 
+            // ── JSON 驱动模式：VShape / YShape ──
+            if (_currentMode == DemoFormationMode.VShape ||
+                _currentMode == DemoFormationMode.YShape)
+            {
+                DriveFromJson();
+                return;
+            }
+
+            // ── 实时演算模式：Breathing / SequentialWave / Lissajous ──
             // 累加时间
             _time += Time.deltaTime * _baseSpeed;
 
@@ -331,6 +381,116 @@ namespace FPT.Business
                 LiftN = lift,
                 AltitudeM = alt,
             });
+        }
+
+        /// <summary>
+        /// 从 TextAsset 解析 JSON 轨迹数据
+        /// </summary>
+        private void ParseTrajectoryJson()
+        {
+            if (_trajectoryJson == null || string.IsNullOrEmpty(_trajectoryJson.text))
+            {
+                Debug.LogWarning("[AnimationDemo] 轨迹 JSON 文件未设置，VShape/YShape 模式无法工作");
+                _trajectoryData = null;
+                return;
+            }
+
+            try
+            {
+                _trajectoryData = JsonConvert.DeserializeObject<AnimationTrajectoryData>(
+                    _trajectoryJson.text
+                );
+
+                if (_trajectoryData?.points == null || _trajectoryData.PointCount == 0)
+                {
+                    Debug.LogWarning("[AnimationDemo] 解析 JSON 后没有找到轨迹点");
+                    return;
+                }
+
+                Debug.Log(
+                    "[AnimationDemo] JSON 轨迹加载成功: " +
+                    $"schema={_trajectoryData.schema_version}, " +
+                    $"formation={_trajectoryData.formation_type}, " +
+                    $"points={_trajectoryData.PointCount}"
+                );
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("[AnimationDemo] 解析 JSON 轨迹失败: " + e.Message);
+                _trajectoryData = null;
+            }
+        }
+
+        /// <summary>
+        /// JSON 驱动模式：插值计算当前时间的关节角度并发送给机械臂
+        /// </summary>
+        private void DriveFromJson()
+        {
+            if (_trajectoryData == null || _trajectoryData.points == null || _trajectoryData.PointCount == 0)
+            {
+                // JSON 未加载，不走
+                return;
+            }
+
+            // 找到当前时间 _time 所在的前后两个点
+            var points = _trajectoryData.points;
+            int prevIdx = 0, nextIdx = 0;
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                if (points[i].t <= _time)
+                {
+                    prevIdx = i;
+                }
+                else
+                {
+                    nextIdx = i;
+                    break;
+                }
+            }
+
+            // 如果超出最后一个点，循环回开头
+            nextIdx = nextIdx % points.Length;
+
+            var prev = points[prevIdx];
+            var next = points[nextIdx];
+            
+            // 线性插值
+            float tTotal = next.t - prev.t;
+            if (tTotal <= 0f) tTotal = 1f;
+            float alpha = (_time - prev.t) / tTotal;
+
+            // 为每个臂插值并发送
+            double[] arm1Angles = null;
+            for (int armIdx = 1; armIdx <= 3; armIdx++)
+            {
+                var prevArm = prev.GetArm(armIdx);
+                var nextArm = next.GetArm(armIdx);
+                if (prevArm == null || nextArm == null ||
+                    prevArm.positions_rad == null || nextArm.positions_rad == null)
+                    continue;
+
+                double[] interp = new double[6];
+                for (int j = 0; j < 6; j++)
+                {
+                    interp[j] = (1d - alpha) * prevArm.positions_rad[j] + alpha * nextArm.positions_rad[j];
+                }
+
+                // 弧度转角度
+                double[] deg = interp.Select(r => r * Mathf.Rad2Deg).ToArray();
+                _animPlatform.SendMessage($"SetArm{armIdx}Angles", deg);
+
+                if (armIdx == 1) arm1Angles = deg;
+            }
+
+            // UI 回调
+            if (arm1Angles != null)
+                OnArmAnglesChanged?.Invoke(arm1Angles);
+
+            // 进度归一化
+            if (points.Length > 0)
+                ArmProgress = (_time / points[^1].t) % 1f;
+            OnArmProgressChanged?.Invoke(ArmProgress);
         }
     }
 

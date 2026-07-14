@@ -3,14 +3,15 @@ using UnityEngine;
 
 namespace FPT.Visualization
 {
-    /// <summary>
+    ///<summary>
     /// 动态阵型可视化器 — 根据当前动画模式切换连线拓扑。
     ///
-    /// 三种连线模式：
+    /// 五种连线模式：
     ///   - Breathing（呼吸聚散）: 闭合三角形（Arm1→Arm2→Arm3→Arm1）
     ///   - SequentialWave（波浪接力）: 开口折线（Arm1→Arm2→Arm3）
     ///   - Lissajous（8字轨迹）: 星型拓扑（Center→Arm1→Center→Arm2→Center→Arm3）
-    ///
+    ///   - VShape（人字形）: 折线（Arm2→Arm1→Arm3），Arm1 为领头
+    ///   - YShape（Y字形）: 折线（Arm2→Arm1→Arm3），Arm1 为领头
     /// 架构约束：
     ///   - 所有目标引用通过 Inspector 拖拽赋值，禁止使用 GameObject.Find
     ///   - AnimationDemoController 通过 Bind() 注入
@@ -132,6 +133,13 @@ namespace FPT.Visualization
                     _lineRenderer.startColor = _lineColor;
                     _lineRenderer.endColor = _lineColor;
                     break;
+
+                case DemoFormationMode.VShape:
+                case DemoFormationMode.YShape:
+                    _lineRenderer.positionCount = 3;
+                    _lineRenderer.startColor = _lineColor;
+                    _lineRenderer.endColor = _lineColor;
+                    break;
             }
         }
 
@@ -166,6 +174,11 @@ namespace FPT.Visualization
 
                 case DemoFormationMode.Lissajous:
                     DrawStarTopology(positions);
+                    break;
+
+                case DemoFormationMode.VShape:
+                case DemoFormationMode.YShape:
+                    DrawVShapeTopology(positions);
                     break;
             }
         }
@@ -209,6 +222,17 @@ namespace FPT.Visualization
             _lineRenderer.SetPosition(4, center);
             _lineRenderer.SetPosition(5, p[2]);
         }
+
+        /// <summary>
+        /// 人字形 / Y字形 — 折线：Arm2→Arm1→Arm3
+        /// </summary>
+        private void DrawVShapeTopology(Vector3[] p)
+        {
+            _lineRenderer.SetPosition(0, p[1]); // Arm2
+            _lineRenderer.SetPosition(1, p[0]); // Arm1
+            _lineRenderer.SetPosition(2, p[2]); // Arm3
+        }
+
 
         // ═══════════════════════════════════════════
         // 材质创建
