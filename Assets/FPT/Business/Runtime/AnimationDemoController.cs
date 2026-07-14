@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using FPT.Core;
 namespace FPT.Business
 {
     /// <summary>
@@ -87,7 +87,7 @@ namespace FPT.Business
         // ═══════════════════════════════════════════
         //  事件（供 UI 订阅）
         // ═══════════════════════════════════════════
-
+        
         public System.Action<float> OnArmProgressChanged;
         public System.Action<bool> OnArmPlayStateChanged;
         public System.Action<double[]> OnArmAnglesChanged;
@@ -102,7 +102,9 @@ namespace FPT.Business
         private bool _plateActive;
 
         private MeshRenderer[] _realRenderers;
-        private MeshRenderer[] _animRenderers;
+        private Renderer[] _animRenderers;
+        private LineRenderer[] _animLineRenderers;
+        private TrailRenderer[] _animTrailRenderers;
 
         // ═══════════════════════════════════════════
         //  生命周期
@@ -119,9 +121,22 @@ namespace FPT.Business
                 _realPlatformRoot = GameObject.Find("flapping_platform");
 
             _realRenderers = _realPlatformRoot?.GetComponentsInChildren<MeshRenderer>() ?? new MeshRenderer[0];
-            _animRenderers = _animPlatformRoot?.GetComponentsInChildren<MeshRenderer>() ?? new MeshRenderer[0];
+            // 收集 AnimationPlatform 下所有渲染组件
+            _animRenderers = _animPlatformRoot?.GetComponentsInChildren<Renderer>() ?? new Renderer[0];
+            _animLineRenderers = _animPlatformRoot?.GetComponentsInChildren<LineRenderer>() ?? new LineRenderer[0];
+            _animTrailRenderers = _animPlatformRoot?.GetComponentsInChildren<TrailRenderer>() ?? new TrailRenderer[0];
 
+            // 默认隐藏动画相关元素：控制面板模式下不可见
             SetRenderersEnabled(_animRenderers, false);
+            SetLineRenderersEnabled(_animLineRenderers, false);
+            SetTrailRenderersEnabled(_animTrailRenderers, false);
+        }
+
+        private System.Collections.IEnumerator Start()
+        {
+            // 等待一帧，确保 AnimationPlatformController.Start() 已完成关节发现
+            yield return null;
+            ApplyInitialPose();
         }
 
         // ═══════════════════════════════════════════
@@ -132,6 +147,9 @@ namespace FPT.Business
         {
             SetRenderersEnabled(_realRenderers, false);
             SetRenderersEnabled(_animRenderers, true);
+            SetLineRenderersEnabled(_animLineRenderers, true);
+            SetTrailRenderersEnabled(_animTrailRenderers, true);
+            _animPlatformRoot?.BroadcastMessage("SetTrailsEnabled", true, SendMessageOptions.DontRequireReceiver);
         }
 
         public void Deactivate()
@@ -139,9 +157,30 @@ namespace FPT.Business
             PauseArm();
             SetRenderersEnabled(_realRenderers, true);
             SetRenderersEnabled(_animRenderers, false);
+            SetLineRenderersEnabled(_animLineRenderers, false);
+            SetTrailRenderersEnabled(_animTrailRenderers, false);
+            _animPlatformRoot?.BroadcastMessage("SetTrailsEnabled", false, SendMessageOptions.DontRequireReceiver);
         }
 
         private static void SetRenderersEnabled(MeshRenderer[] renderers, bool enabled)
+        {
+            foreach (var r in renderers)
+                if (r != null) r.enabled = enabled;
+        }
+
+        private static void SetRenderersEnabled(Renderer[] renderers, bool enabled)
+        {
+            foreach (var r in renderers)
+                if (r != null) r.enabled = enabled;
+        }
+
+        private static void SetLineRenderersEnabled(LineRenderer[] renderers, bool enabled)
+        {
+            foreach (var r in renderers)
+                if (r != null) r.enabled = enabled;
+        }
+
+        private static void SetTrailRenderersEnabled(TrailRenderer[] renderers, bool enabled)
         {
             foreach (var r in renderers)
                 if (r != null) r.enabled = enabled;
@@ -188,6 +227,31 @@ namespace FPT.Business
             if (index >= 0 && index < modes.Length)
                 _currentMode = modes[index];
             StopArm();
+        }
+
+        /// <summary>
+        /// 启动时将机械臂设置到轨迹初始姿态，避免显示默认静止姿态
+        /// </summary>
+        private void ApplyInitialPose()
+        {
+            if (_animPlatform == null) return;
+
+            // 使用 TrajectoryGenerator 获取初始角度（时间 t=0）
+            const int armCount = 3;
+            for (int arm = 0; arm < armCount; arm++)
+            {
+                double[] radAngles = TrajectoryGenerator.GetJointAngles(
+                    _currentMode, 0f, arm, _amplitude, _baseFrequency);
+                
+                // 转换为角度
+                double[] degAngles = new double[6];
+                for (int j = 0; j < 6; j++)
+                    degAngles[j] = radAngles[j] * Mathf.Rad2Deg;
+
+                _animPlatform.SendMessage($"SetArm{arm + 1}Angles", degAngles);
+            }
+
+            Debug.Log($"[AnimationDemo] 启动初始化：{armCount} 臂已对齐轨迹初始姿态");
         }
 
         // ═══════════════════════════════════════════
