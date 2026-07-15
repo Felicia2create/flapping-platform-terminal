@@ -216,20 +216,32 @@
                 </ui:VisualElement>
                 <ui:Label name="AnimStatusLabel" text="就绪" class="animation-status" />
                 <ui:VisualElement class="control-section">
-                    <ui:Label text="路径选择" class="section-title" />
-                    <ui:VisualElement name="PathList" class="path-list">
-                        <ui:Button name="PathButton0" text="路径 1 · 上下扑动" class="path-button path-active" />
-                    </ui:VisualElement>
+                    <ui:Label text="阵型模式" class="section-title" />
+                    <ui:VisualElement name="ModeSelectorContainer" class="speed-row" />
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section">
                     <ui:Label text="播放" class="section-title" />
                     <ui:Button name="PlayButton" text="▶ 播放" class="play-button" />
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section">
-                    <ui:Label text="机械臂倍速" class="section-title" />
+                    <ui:Label text="基础速度" class="section-title" />
                     <ui:VisualElement class="speed-row">
                         <ui:Slider name="SpeedSlider" low-value="0.1" high-value="5" value="1" class="speed-slider" />
                         <ui:Label name="SpeedValueLabel" text="1.0x" class="speed-value" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="control-section">
+                    <ui:Label text="动作幅度" class="section-title" />
+                    <ui:VisualElement class="speed-row">
+                        <ui:Slider name="AmplitudeSlider" low-value="0.01" high-value="1.5" value="0.3" class="speed-slider" />
+                        <ui:Label name="AmplitudeValueLabel" text="0.30 rad" class="speed-value" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="control-section">
+                    <ui:Label text="基础频率" class="section-title" />
+                    <ui:VisualElement class="speed-row">
+                        <ui:Slider name="FrequencySlider" low-value="0.1" high-value="3" value="0.5" class="speed-slider" />
+                        <ui:Label name="FrequencyValueLabel" text="0.50 Hz" class="speed-value" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section">
@@ -245,6 +257,25 @@
                 <ui:VisualElement class="panel-header">
                     <ui:Label text="数据显示" class="panel-header-title" />
                     <ui:Label text="TELEMETRY" class="panel-header-sub" />
+                </ui:VisualElement>
+                <ui:VisualElement class="data-section">
+                    <ui:Label text="样机单独显示" class="section-title" />
+                    <ui:VisualElement class="prototype-button-row">
+                        <ui:Button name="PrototypeButtonAll" text="全部显示" class="prototype-button prototype-button-active" />
+                        <ui:Button name="PrototypeButton1" text="样机 1" class="prototype-button" />
+                        <ui:Button name="PrototypeButton2" text="样机 2" class="prototype-button" />
+                        <ui:Button name="PrototypeButton3" text="样机 3" class="prototype-button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="data-section">
+                    <ui:Label text="局部放大" class="section-title" />
+                    <ui:VisualElement class="closeup-card">
+                        <ui:VisualElement class="closeup-head">
+                            <ui:Label name="PrototypeCloseupTitle" text="全部样机 · 实时特写" class="closeup-title" />
+                            <ui:Label text="LIVE" class="closeup-badge" />
+                        </ui:VisualElement>
+                        <ui:Image name="PrototypeCloseupImage" class="closeup-image" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="data-section">
                     <ui:Label text="扑翼无人机飞行参数" class="section-title" />
@@ -268,20 +299,6 @@
                             <ui:Label name="DroneSpeedLabel" text="-- m/s" class="chart-value" />
                         </ui:VisualElement>
                         <ui:VisualElement name="ChartSpeed" class="chart-plot" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="chart-card">
-                        <ui:VisualElement class="chart-head">
-                            <ui:Label text="攻角" class="chart-title" />
-                            <ui:Label name="DroneAoaLabel" text="--°" class="chart-value" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="ChartAoa" class="chart-plot" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="chart-card">
-                        <ui:VisualElement class="chart-head">
-                            <ui:Label text="升力" class="chart-title" />
-                            <ui:Label name="DroneLiftLabel" text="-- N" class="chart-value" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="ChartLift" class="chart-plot" />
                     </ui:VisualElement>
                     <ui:VisualElement class="chart-card">
                         <ui:VisualElement class="chart-head">

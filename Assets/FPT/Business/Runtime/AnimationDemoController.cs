@@ -1,74 +1,141 @@
-using FPT.Core;
 using UnityEngine;
+using FPT.Core;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace FPT.Business
 {
+    /// <summary>
+    /// 动画演示控制器（混合驱动版）
+    ///
+    ///   - Breathing / SequentialWave / Lissajous：实时数学演算
+    ///   - VShape / YShape：离线 JSON 驱动（从 formation_trajectory.json 读取）
+    /// </summary>
     public class AnimationDemoController : MonoBehaviour
     {
-        [Header("轨迹 JSON（拖入 .json 文件）")]
-        [SerializeField] private TextAsset _trajectoryJson;
+        // ═══════════════════════════════════════════
+        //  Inspector 可调参数
+        // ═══════════════════════════════════════════
 
-        [Header("多路径（最多 4 条，对应 UI 路径 1-4）")]
-        [SerializeField] private TextAsset[] _trajectoryJsons = new TextAsset[4];
+        [Header("阵型模式")]
+        [SerializeField] private DemoFormationMode _currentMode = DemoFormationMode.Breathing;
 
-        [Header("平台")]
+        [Header("运动参数")]
+        [SerializeField, Range(0.1f, 5f)]
+        private float _baseSpeed = 1.0f;
+
+        [SerializeField, Range(0.01f, 1.5f)]
+        private float _amplitude = 0.3f;  // 弧度
+
+        [SerializeField, Range(0.1f, 3f)]
+        private float _baseFrequency = 0.5f;  // Hz
+
+        [Header("平台引用")]
         [SerializeField] private MonoBehaviour _animPlatform;
         [SerializeField] private GameObject _realPlatformRoot;
         [SerializeField] private GameObject _animPlatformRoot;
 
-        [Header("多臂")]
-        [SerializeField] private int _armCount = 1;
-        [SerializeField] private float _phaseOffset = 0f;
+        [Header("转台")]
+        [SerializeField] private float _plateSpeed = 0f;
 
-        [Header("阵型模式（每臂独立轨迹，优先级高于单轨迹 + 相位偏移）")]
-        [SerializeField] private TextAsset[] _perArmTrajectoryJsons = new TextAsset[3];
+        [Header("JSON 轨迹（VShape / YShape 模式）")]
+        [SerializeField] private TextAsset _trajectoryJson;
 
-        [Header("设置")]
-        [SerializeField] private float _playbackSpeed = 1.0f;
+        [Header("特写镜头")]
+        [SerializeField] private int _closeupTextureWidth = 512;
+        [SerializeField] private int _closeupTextureHeight = 288;
+        [SerializeField] private float _closeupDistance = 0.85f;
+        [SerializeField] private float _closeupHeight = 0.42f;
 
-        private AnimationTrajectoryData _data;
-        private AnimationTrajectoryData[] _perArmData;
+        // ═══════════════════════════════════════════
+        //  内部数据
+        // ═══════════════════════════════════════════
+
+        private AnimationTrajectoryData _trajectoryData;
+
+        // ═══════════════════════════════════════════
+        //  公共属性（供 Inspector / UI 使用）
+        // ═══════════════════════════════════════════
+
+        public DemoFormationMode CurrentMode
+        {
+            get => _currentMode;
+            set => _currentMode = value;
+        }
+
+        public float BaseSpeed
+        {
+            get => _baseSpeed;
+            set => _baseSpeed = Mathf.Clamp(value, 0.1f, 5f);
+        }
+
+        public float Amplitude
+        {
+            get => _amplitude;
+            set => _amplitude = Mathf.Clamp(value, 0.01f, 1.5f);
+        }
+
+        public float BaseFrequency
+        {
+            get => _baseFrequency;
+            set => _baseFrequency = Mathf.Clamp(value, 0.1f, 3f);
+        }
+
+        /// <summary>兼容旧接口：播放速度 = BaseSpeed</summary>
+        public float PlaybackSpeed
+        {
+            get => _baseSpeed;
+            set => _baseSpeed = Mathf.Clamp(value, 0.1f, 5f);
+        }
+
+        public float PlateSpeed
+        {
+            get => _plateSpeed;
+            set => _plateSpeed = value;
+        }
+
+        public RenderTexture CloseupTexture => _closeupTexture;
+
+        // ═══════════════════════════════════════════
+        //  状态
+        // ═══════════════════════════════════════════
 
         public bool IsArmPlaying { get; private set; }
         public bool IsArmPaused { get; private set; }
         public float ArmProgress { get; private set; }
-        public float PlaybackSpeed
-        {
-            get => _playbackSpeed;
-            set => _playbackSpeed = Mathf.Max(0.1f, value);
-        }
 
-        public float PlateSpeed { get; set; } = 0f;
-        private bool _plateActive;
-        private float _plateAngle;
-
-        private float _elapsed;
-        private float[] _elapsedPerArm;
-
-        private MeshRenderer[] _realRenderers;
-        private Renderer[] _animRenderers;
-        private LineRenderer[] _animLineRenderers;
-        private TrailRenderer[] _animTrailRenderers;
-
-        public AnimationTrajectoryData TrajectoryData => _data;
-
+        // ═══════════════════════════════════════════
+        //  事件（供 UI 订阅）
+        // ═══════════════════════════════════════════
+        
         public System.Action<float> OnArmProgressChanged;
         public System.Action<bool> OnArmPlayStateChanged;
         public System.Action<double[]> OnArmAnglesChanged;
         public System.Action<FlapFlightParams> OnFlightParamsChanged;
 
-        private TextAsset[] _paths;
-        private int _selectedPath;
-        private float _flapAmplitudeDeg;
+        // ═══════════════════════════════════════════
+        //  内部状态
+        // ═══════════════════════════════════════════
 
-        public int SelectedPath => _selectedPath;
+        private float _time;
+        private float _plateAngle;
+        private bool _plateActive;
+
+        private MeshRenderer[] _realRenderers;
+        private Renderer[] _animRenderers;
+        private LineRenderer[] _animLineRenderers;
+        private TrailRenderer[] _animTrailRenderers;
+        private int _activePrototypeIndex = 0;
+        private Camera _closeupCamera;
+        private RenderTexture _closeupTexture;
+
+        // ═══════════════════════════════════════════
+        //  生命周期
+        // ═══════════════════════════════════════════
 
         private void Awake()
         {
-            ResolvePaths();
-            if (_paths[0] != null)
-                ParsePath(0);
-
+            // 自动查找平台
             if (_animPlatformRoot == null)
                 _animPlatformRoot = GameObject.Find("AnimationPlatform") ?? GameObject.Find("AnimationPlatform ");
             if (_animPlatform == null && _animPlatformRoot != null)
@@ -81,11 +148,15 @@ namespace FPT.Business
             _animRenderers = _animPlatformRoot?.GetComponentsInChildren<Renderer>() ?? new Renderer[0];
             _animLineRenderers = _animPlatformRoot?.GetComponentsInChildren<LineRenderer>() ?? new LineRenderer[0];
             _animTrailRenderers = _animPlatformRoot?.GetComponentsInChildren<TrailRenderer>() ?? new TrailRenderer[0];
+            CreateCloseupCamera();
 
             // 默认隐藏动画相关元素：控制面板模式下不可见
             SetRenderersEnabled(_animRenderers, false);
             SetLineRenderersEnabled(_animLineRenderers, false);
             SetTrailRenderersEnabled(_animTrailRenderers, false);
+
+            // 解析离线 JSON 轨迹文件
+            ParseTrajectoryJson();
         }
 
         private System.Collections.IEnumerator Start()
@@ -95,83 +166,8 @@ namespace FPT.Business
             ApplyInitialPose();
         }
 
-        private void ResolvePaths()
-        {
-            _paths = new TextAsset[4];
-            // 1) 优先用 Inspector 配置的数组
-            if (_trajectoryJsons != null)
-                for (int i = 0; i < 4 && i < _trajectoryJsons.Length; i++)
-                    _paths[i] = _trajectoryJsons[i];
-            // 2) 槽 0 回退到单文件字段
-            if (_paths[0] == null) _paths[0] = _trajectoryJson;
-            // 3) 仍为空的槽尝试从 Resources/Trajectories 自动加载已知文件
-            string[] known = { "unity_cycle", "up_down_demo" };
-            for (int i = 0; i < known.Length; i++)
-                if (_paths[i] == null)
-                    _paths[i] = Resources.Load<TextAsset>($"Trajectories/{known[i]}");
-
-            // 阵型模式：自动加载每臂独立轨迹（如果 Inspector 未手动配置）
-            if (_perArmTrajectoryJsons == null || _perArmTrajectoryJsons.Length < 3)
-                _perArmTrajectoryJsons = new TextAsset[3];
-            string[] armKnown = { "breathing_arm1", "breathing_arm2", "breathing_arm3" };
-            for (int i = 0; i < 3; i++)
-                if (_perArmTrajectoryJsons[i] == null)
-                    _perArmTrajectoryJsons[i] = Resources.Load<TextAsset>($"Trajectories/{armKnown[i]}");
-        }
-
-        /// <summary> 切换到第 index 条路径（0-3），由 UI 路径按钮调用 </summary>
-        public void SelectPath(int index)
-        {
-            StopArm();
-            ParsePath(index);
-        }
-
-        private void ParsePath(int index)
-        {
-            _selectedPath = Mathf.Clamp(index, 0, 3);
-            var asset = _paths != null ? _paths[_selectedPath] : null;
-            if (asset == null)
-            {
-                Debug.LogWarning($"[AnimationDemo] 路径 {_selectedPath + 1} 未配置轨迹 JSON");
-                return;
-            }
-
-            _data = JsonUtility.FromJson<AnimationTrajectoryData>(asset.text);
-            if (_data != null && _data.points != null && _data.points.Length > 0)
-            {
-                _flapAmplitudeDeg = ComputeFlapAmplitudeDeg(_data);
-                Debug.Log($"[AnimationDemo] 路径{_selectedPath + 1} 解析: {_data.planning_group}, {_data.points.Length} 点, {_data.cycle_duration_sec:F1}s, {_data.sample_rate_hz}Hz");
-            }
-            else
-            {
-                Debug.LogWarning("[AnimationDemo] JSON 解析失败或轨迹为空");
-            }
-        }
-
-        /// <summary> 取轨迹中各关节峰峰值的最大者，作为扑翼拍动幅度（度，半幅） </summary>
-        private static float ComputeFlapAmplitudeDeg(AnimationTrajectoryData data)
-        {
-            float maxRange = 0f;
-            for (int j = 0; j < 6; j++)
-            {
-                double min = double.MaxValue, max = double.MinValue;
-                foreach (var p in data.points)
-                {
-                    if (p.positions_rad == null || j >= p.positions_rad.Length) continue;
-                    if (p.positions_rad[j] < min) min = p.positions_rad[j];
-                    if (p.positions_rad[j] > max) max = p.positions_rad[j];
-                }
-                if (max > min)
-                {
-                    float range = (float)(max - min) * Mathf.Rad2Deg;
-                    if (range > maxRange) maxRange = range;
-                }
-            }
-            return maxRange * 0.5f;
-        }
-
         // ═══════════════════════════════════════════
-        // 平台切换
+        //  平台切换
         // ═══════════════════════════════════════════
 
         public void Activate()
@@ -180,6 +176,7 @@ namespace FPT.Business
             SetRenderersEnabled(_animRenderers, true);
             SetLineRenderersEnabled(_animLineRenderers, true);
             SetTrailRenderersEnabled(_animTrailRenderers, true);
+            ApplyPrototypeVisibility();
             _animPlatformRoot?.BroadcastMessage("SetTrailsEnabled", true, SendMessageOptions.DontRequireReceiver);
         }
 
@@ -191,6 +188,129 @@ namespace FPT.Business
             SetLineRenderersEnabled(_animLineRenderers, false);
             SetTrailRenderersEnabled(_animTrailRenderers, false);
             _animPlatformRoot?.BroadcastMessage("SetTrailsEnabled", false, SendMessageOptions.DontRequireReceiver);
+        }
+
+        public void ShowPrototypeOnly(int prototypeIndex)
+        {
+            if (prototypeIndex < 1 || prototypeIndex > 3) return;
+
+            _activePrototypeIndex = prototypeIndex;
+            ApplyPrototypeVisibility();
+            UpdateCloseupCamera();
+        }
+
+        public void ShowAllPrototypes()
+        {
+            _activePrototypeIndex = 0;
+            ApplyPrototypeVisibility();
+            UpdateCloseupCamera();
+        }
+
+        private void SetPrototypeVisible(int prototypeIndex, bool visible)
+        {
+            _animPlatformRoot?.BroadcastMessage(
+                "SetArmVisible",
+                new ArmVisibilityCommand(prototypeIndex, visible),
+                SendMessageOptions.DontRequireReceiver
+            );
+        }
+
+        private void ApplyPrototypeVisibility()
+        {
+            for (int prototypeIndex = 1; prototypeIndex <= 3; prototypeIndex++)
+                SetPrototypeVisible(prototypeIndex, _activePrototypeIndex == 0 || prototypeIndex == _activePrototypeIndex);
+        }
+
+        private void CreateCloseupCamera()
+        {
+            if (_closeupTexture == null)
+            {
+                _closeupTexture = new RenderTexture(_closeupTextureWidth, _closeupTextureHeight, 16)
+                {
+                    name = "PrototypeCloseupTexture",
+                    antiAliasing = 2
+                };
+            }
+
+            if (_closeupCamera != null) return;
+
+            var cameraObject = new GameObject("PrototypeCloseupCamera");
+            cameraObject.transform.SetParent(transform, false);
+            _closeupCamera = cameraObject.AddComponent<Camera>();
+            _closeupCamera.targetTexture = _closeupTexture;
+            _closeupCamera.clearFlags = CameraClearFlags.Skybox;
+            _closeupCamera.fieldOfView = 24f;
+            _closeupCamera.depth = -20f;
+            _closeupCamera.enabled = true;
+
+            var mainCamera = Camera.main;
+            if (mainCamera != null)
+            {
+                _closeupCamera.cullingMask = mainCamera.cullingMask;
+                _closeupCamera.clearFlags = mainCamera.clearFlags;
+                _closeupCamera.backgroundColor = mainCamera.backgroundColor;
+            }
+
+            UpdateCloseupCamera();
+        }
+
+        private void LateUpdate()
+        {
+            UpdateCloseupCamera();
+        }
+
+        private void UpdateCloseupCamera()
+        {
+            if (_closeupCamera == null || _animPlatformRoot == null) return;
+            if (!TryGetCloseupBounds(out var bounds)) return;
+
+            var focus = bounds.center;
+            var size = Mathf.Max(bounds.extents.magnitude, 0.35f);
+            var distance = Mathf.Max(_closeupDistance, size * 1.05f);
+            var direction = new Vector3(0.75f, 0.45f, -1f).normalized;
+
+            _closeupCamera.transform.position = focus - direction * distance + Vector3.up * _closeupHeight;
+            _closeupCamera.transform.LookAt(focus + Vector3.up * Mathf.Min(size * 0.35f, 0.45f));
+        }
+
+        private bool TryGetCloseupBounds(out Bounds bounds)
+        {
+            bool hasBounds = false;
+            bounds = new Bounds(_animPlatformRoot.transform.position, Vector3.one);
+
+            foreach (var renderer in _animRenderers)
+            {
+                if (renderer == null || !ShouldIncludeInCloseup(renderer)) continue;
+
+                if (!hasBounds)
+                {
+                    bounds = renderer.bounds;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(renderer.bounds);
+                }
+            }
+
+            return hasBounds;
+        }
+
+        private bool ShouldIncludeInCloseup(Renderer renderer)
+        {
+            if (_activePrototypeIndex == 0) return true;
+            return GetTransformPath(renderer.transform).Contains($"arm{_activePrototypeIndex}_");
+        }
+
+        private static string GetTransformPath(Transform transform)
+        {
+            var path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                path = transform.name + "/" + path;
+            }
+            return path;
         }
 
         private static void SetRenderersEnabled(MeshRenderer[] renderers, bool enabled)
@@ -217,57 +337,25 @@ namespace FPT.Business
                 if (r != null) r.enabled = enabled;
         }
 
+        private void OnDestroy()
+        {
+            if (_closeupCamera != null)
+                Destroy(_closeupCamera.gameObject);
+
+            if (_closeupTexture != null)
+            {
+                _closeupTexture.Release();
+                Destroy(_closeupTexture);
+            }
+        }
+
         // ═══════════════════════════════════════════
-        // 机械臂控制
+        //  播放控制
         // ═══════════════════════════════════════════
 
         public void PlayArm()
         {
             _plateActive = true;
-
-            // 尝试解析阵型模式（每臂独立轨迹）
-            _perArmData = null;
-            bool hasPerArm = true;
-            for (int i = 0; i < 3; i++)
-            {
-                if (_perArmTrajectoryJsons == null || i >= _perArmTrajectoryJsons.Length || _perArmTrajectoryJsons[i] == null)
-                {
-                    hasPerArm = false;
-                    break;
-                }
-            }
-            if (hasPerArm)
-            {
-                _perArmData = new AnimationTrajectoryData[3];
-                for (int i = 0; i < 3; i++)
-                {
-                    _perArmData[i] = JsonUtility.FromJson<AnimationTrajectoryData>(_perArmTrajectoryJsons[i].text);
-                    if (_perArmData[i] == null || _perArmData[i].points == null || _perArmData[i].points.Length == 0)
-                    {
-                        Debug.LogWarning($"[AnimationDemo] 阵型轨迹 arm{i + 1} 解析失败，回退到单轨迹模式");
-                        _perArmData = null;
-                        hasPerArm = false;
-                        break;
-                    }
-                }
-                if (hasPerArm)
-                    Debug.Log("[AnimationDemo] 阵型模式激活：3 臂独立轨迹");
-            }
-
-            if (_data == null || _data.points == null || _data.points.Length == 0)
-            {
-                if (!hasPerArm)
-                    Debug.LogWarning("[AnimationDemo] 无轨迹数据，仅转台旋转");
-            }
-
-            // 初始化每个臂的独立计时器
-            int armCount = hasPerArm ? 3 : _armCount;
-            _elapsedPerArm = new float[armCount];
-            float cycle = hasPerArm ? _perArmData[0].cycle_duration_sec : _data.cycle_duration_sec;
-            float step = _phaseOffset > 0f ? _phaseOffset : (cycle / armCount);
-            for (int i = 0; i < armCount; i++)
-                _elapsedPerArm[i] = step * i;
-
             IsArmPlaying = true;
             IsArmPaused = false;
             OnArmPlayStateChanged?.Invoke(true);
@@ -286,26 +374,28 @@ namespace FPT.Business
             IsArmPlaying = false;
             IsArmPaused = false;
             _plateActive = false;
-            _elapsed = 0;
+            _time = 0;
             ArmProgress = 0;
-            _elapsedPerArm = null;
             OnArmProgressChanged?.Invoke(0);
             OnArmPlayStateChanged?.Invoke(false);
-
-            var wp0 = _data?.points?[0];
-            if (wp0 != null && _animPlatform != null)
-            {
-                for (int arm = 1; arm <= _armCount; arm++)
-                    _animPlatform.SendMessage($"SetArm{arm}Angles", GetAnglesFromPoint(wp0));
-            }
         }
 
-        private static double[] GetAnglesFromPoint(TrajectoryPoint pt)
+        /// <summary>
+        /// 兼容旧 UI 路径选择接口（保留方法签名，内部切换模式）
+        /// PathButton0 → SequentialWave, PathButton1 → Breathing, PathButton2 → Lissajous
+        /// </summary>
+        public void SelectPath(int index)
         {
-            var a = new double[6];
-            for (int i = 0; i < 6 && i < pt.positions_rad.Length; i++)
-                a[i] = pt.positions_rad[i] * Mathf.Rad2Deg;
-            return a;
+            var modes = new[] {
+                DemoFormationMode.SequentialWave,
+                DemoFormationMode.Breathing,
+                DemoFormationMode.Lissajous,
+                DemoFormationMode.VShape,
+                DemoFormationMode.YShape
+            };
+            if (index >= 0 && index < modes.Length)
+                _currentMode = modes[index];
+            StopArm();
         }
 
         /// <summary>
@@ -315,20 +405,46 @@ namespace FPT.Business
         {
             if (_animPlatform == null) return;
 
-            var wp0 = _data?.points?[0];
-            if (wp0 == null) return;
+            // ── JSON 驱动模式：从 JSON 读取初始姿态 ──
+            if (_currentMode == DemoFormationMode.VShape ||
+                _currentMode == DemoFormationMode.YShape)
+            {
+                if (_trajectoryData != null && _trajectoryData.PointCount > 0)
+                {
+                    var firstPoint = _trajectoryData.points[0];
+                    for (int arm = 1; arm <= 3; arm++)
+                    {
+                        var armData = firstPoint.GetArm(arm);
+                        if (armData?.positions_rad == null) continue;
 
-            int armCount = Mathf.Max(_armCount, 1);
-            var initAngles = GetAnglesFromPoint(wp0);
+                        double[] degAngles = armData.positions_rad
+                            .Select(r => r * Mathf.Rad2Deg).ToArray();
+                        _animPlatform.SendMessage($"SetArm{arm}Angles", degAngles);
+                    }
+                    Debug.Log("[AnimationDemo] JSON 初始姿态已应用");
+                }
+                return;
+            }
 
-            for (int arm = 1; arm <= armCount; arm++)
-                _animPlatform.SendMessage($"SetArm{arm}Angles", initAngles);
+            // ── 实时演算模式：从 TrajectoryGenerator 获取初始姿态 ──
+            const int armCount = 3;
+            for (int arm = 0; arm < armCount; arm++)
+            {
+                double[] radAngles = TrajectoryGenerator.GetJointAngles(
+                    _currentMode, 0f, arm, _amplitude, _baseFrequency);
+                
+                double[] degAngles = new double[6];
+                for (int j = 0; j < 6; j++)
+                    degAngles[j] = radAngles[j] * Mathf.Rad2Deg;
+
+                _animPlatform.SendMessage($"SetArm{arm + 1}Angles", degAngles);
+            }
 
             Debug.Log($"[AnimationDemo] 启动初始化：{armCount} 臂已对齐轨迹初始姿态");
         }
 
         // ═══════════════════════════════════════════
-        // 驱动
+        //  每帧驱动
         // ═══════════════════════════════════════════
 
         private void Update()
@@ -336,67 +452,78 @@ namespace FPT.Business
             if (_animPlatform == null) return;
 
             // 转台：独立旋转
-            if (_plateActive && PlateSpeed > 0f)
+            if (_plateActive && _plateSpeed > 0f)
             {
-                _plateAngle += PlateSpeed * Time.deltaTime;
+                _plateAngle += _plateSpeed * Time.deltaTime;
                 _animPlatform.SendMessage("SetPlateAngle", _plateAngle);
             }
 
             // 机械臂：Play 后才动
             if (!IsArmPlaying) return;
 
-            bool usePerArm = _perArmData != null;
-            if (!usePerArm && (_data == null || _data.points == null)) return;
-
-            float cycleDuration = usePerArm ? _perArmData[0].cycle_duration_sec : _data.cycle_duration_sec;
-            int driveArmCount = usePerArm ? _perArmData.Length : _armCount;
-
-            _elapsed += Time.deltaTime * _playbackSpeed;
-            if (_elapsed >= cycleDuration)
-                _elapsed -= cycleDuration;
-            ArmProgress = Mathf.Clamp01(_elapsed / cycleDuration);
-
-            // 驱动每个臂
-            double[] displayAngles = null;
-            for (int arm = 0; arm < driveArmCount; arm++)
+            // ── JSON 驱动模式：VShape / YShape ──
+            if (_currentMode == DemoFormationMode.VShape ||
+                _currentMode == DemoFormationMode.YShape)
             {
-                _elapsedPerArm[arm] += Time.deltaTime * _playbackSpeed;
-                if (_elapsedPerArm[arm] >= cycleDuration)
-                    _elapsedPerArm[arm] -= cycleDuration;
-
-                double[] angles;
-                if (usePerArm)
-                    angles = InterpolateArmWith(_elapsedPerArm[arm], _perArmData[arm]);
-                else
-                    angles = InterpolateArm(_elapsedPerArm[arm]);
-
-                if (arm == 0) displayAngles = angles;
-                _animPlatform.SendMessage($"SetArm{arm + 1}Angles", angles);
+                DriveFromJson();
+                return;
             }
 
-            if (displayAngles != null) OnArmAnglesChanged?.Invoke(displayAngles);
+            // ── 实时演算模式：Breathing / SequentialWave / Lissajous ──
+            // 累加时间
+            _time += Time.deltaTime * _baseSpeed;
+
+            // 为 3 个臂分别生成关节角度
+            double[] arm1Angles = null;
+            for (int arm = 0; arm < 3; arm++)
+            {
+                // TrajectoryGenerator 输出单位：弧度
+                double[] radAngles = TrajectoryGenerator.GetJointAngles(
+                    _currentMode, _time, arm, _amplitude, _baseFrequency);
+
+                // 转换为角度（AnimationPlatformController.SetArmAngles 需要角度）
+                double[] degAngles = new double[6];
+                for (int j = 0; j < 6; j++)
+                    degAngles[j] = radAngles[j] * Mathf.Rad2Deg;
+
+                _animPlatform.SendMessage($"SetArm{arm + 1}Angles", degAngles);
+
+                if (arm == 0) arm1Angles = degAngles;
+            }
+
+            // 回传 arm1 角度给 UI 显示
+            if (arm1Angles != null)
+                OnArmAnglesChanged?.Invoke(arm1Angles);
+
+            // 发射飞行参数
             EmitFlightParams();
+
+            // 进度（归一化到 [0,1]，以 2π 为一个周期）
+            float cyclePeriod = 1f / Mathf.Max(_baseFrequency, 0.01f);
+            ArmProgress = Mathf.Repeat(_time, cyclePeriod) / cyclePeriod;
             OnArmProgressChanged?.Invoke(ArmProgress);
         }
 
-        /// <summary>
-        /// 扑翼飞行参数：拍动频率/幅度取自轨迹，其余由频率·幅度·进度推导的简化估计。
-        /// </summary>
+        // ═══════════════════════════════════════════
+        //  飞行参数估算
+        // ═══════════════════════════════════════════
+
         private void EmitFlightParams()
         {
             if (OnFlightParamsChanged == null) return;
-            float cycle = _data?.cycle_duration_sec ?? 0f;
-            float freq = cycle > 0.01f ? _playbackSpeed / cycle : 0f;
-            float amp = _flapAmplitudeDeg;
-            float phase = 2f * Mathf.PI * ArmProgress;
-            float speed = freq * amp * 0.02f;          // 启发式空速 (m/s)
-            float aoa = 8f + 6f * Mathf.Sin(phase);    // 攻角随拍动周期摆动 (°)
-            float lift = 1.8f * speed * speed;         // 简化升力 ∝ v² (N)
-            float alt = 1.5f + 0.05f * Mathf.Sin(phase); // 高度小幅起伏 (m)
+
+            float freq = _baseFrequency * _baseSpeed;
+            float ampDeg = _amplitude * Mathf.Rad2Deg;
+            float phase = 2f * Mathf.PI * _baseFrequency * _time;
+            float speed = freq * ampDeg * 0.02f;          // 启发式空速 (m/s)
+            float aoa = 8f + 6f * Mathf.Sin(phase);       // 攻角 (°)
+            float lift = 1.8f * speed * speed;             // 升力 (N)
+            float alt = 1.5f + 0.05f * Mathf.Sin(phase);  // 高度 (m)
+
             OnFlightParamsChanged.Invoke(new FlapFlightParams
             {
                 FlapFrequencyHz = freq,
-                FlapAmplitudeDeg = amp,
+                FlapAmplitudeDeg = ampDeg,
                 AirspeedMps = speed,
                 AngleOfAttackDeg = aoa,
                 LiftN = lift,
@@ -404,49 +531,114 @@ namespace FPT.Business
             });
         }
 
-        // ═══════════════════════════════════════════
-        // 插值（弧度 JSON → 返回度数）
-        // ═══════════════════════════════════════════
-
-        private double[] InterpolateArm(float time)
+        /// <summary>
+        /// 从 TextAsset 解析 JSON 轨迹数据
+        /// </summary>
+        private void ParseTrajectoryJson()
         {
-            var pts = _data.points;
-            return InterpolatePoints(time, pts);
-        }
-
-        private double[] InterpolateArmWith(float time, AnimationTrajectoryData trajData)
-        {
-            var pts = trajData.points;
-            return InterpolatePoints(time, pts);
-        }
-
-        private static double[] InterpolatePoints(float time, TrajectoryPoint[] pts)
-        {
-            if (pts.Length == 0) return new double[6];
-
-            if (time <= pts[0].t) return RadToDeg(pts[0].positions_rad);
-            if (time >= pts[pts.Length - 1].t) return RadToDeg(pts[pts.Length - 1].positions_rad);
-
-            for (int i = 0; i < pts.Length - 1; i++)
+            if (_trajectoryJson == null || string.IsNullOrEmpty(_trajectoryJson.text))
             {
-                if (time >= pts[i].t && time <= pts[i + 1].t)
+                Debug.LogWarning("[AnimationDemo] 轨迹 JSON 文件未设置，VShape/YShape 模式无法工作");
+                _trajectoryData = null;
+                return;
+            }
+
+            try
+            {
+                _trajectoryData = JsonConvert.DeserializeObject<AnimationTrajectoryData>(
+                    _trajectoryJson.text
+                );
+
+                if (_trajectoryData?.points == null || _trajectoryData.PointCount == 0)
                 {
-                    float t = (time - pts[i].t) / (pts[i + 1].t - pts[i].t);
-                    var r = new double[6];
-                    for (int j = 0; j < 6; j++)
-                        r[j] = (pts[i].positions_rad[j] + (pts[i + 1].positions_rad[j] - pts[i].positions_rad[j]) * t) * Mathf.Rad2Deg;
-                    return r;
+                    Debug.LogWarning("[AnimationDemo] 解析 JSON 后没有找到轨迹点");
+                    return;
+                }
+
+                Debug.Log(
+                    "[AnimationDemo] JSON 轨迹加载成功: " +
+                    $"schema={_trajectoryData.schema_version}, " +
+                    $"formation={_trajectoryData.formation_type}, " +
+                    $"points={_trajectoryData.PointCount}"
+                );
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("[AnimationDemo] 解析 JSON 轨迹失败: " + e.Message);
+                _trajectoryData = null;
+            }
+        }
+
+        /// <summary>
+        /// JSON 驱动模式：插值计算当前时间的关节角度并发送给机械臂
+        /// </summary>
+        private void DriveFromJson()
+        {
+            if (_trajectoryData == null || _trajectoryData.points == null || _trajectoryData.PointCount == 0)
+            {
+                // JSON 未加载，不走
+                return;
+            }
+
+            // 找到当前时间 _time 所在的前后两个点
+            var points = _trajectoryData.points;
+            int prevIdx = 0, nextIdx = 0;
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                if (points[i].t <= _time)
+                {
+                    prevIdx = i;
+                }
+                else
+                {
+                    nextIdx = i;
+                    break;
                 }
             }
-            return RadToDeg(pts[pts.Length - 1].positions_rad);
-        }
 
-        private static double[] RadToDeg(double[] rad)
-        {
-            var deg = new double[rad.Length];
-            for (int i = 0; i < rad.Length; i++)
-                deg[i] = rad[i] * Mathf.Rad2Deg;
-            return deg;
+            // 如果超出最后一个点，循环回开头
+            nextIdx = nextIdx % points.Length;
+
+            var prev = points[prevIdx];
+            var next = points[nextIdx];
+            
+            // 线性插值
+            float tTotal = next.t - prev.t;
+            if (tTotal <= 0f) tTotal = 1f;
+            float alpha = (_time - prev.t) / tTotal;
+
+            // 为每个臂插值并发送
+            double[] arm1Angles = null;
+            for (int armIdx = 1; armIdx <= 3; armIdx++)
+            {
+                var prevArm = prev.GetArm(armIdx);
+                var nextArm = next.GetArm(armIdx);
+                if (prevArm == null || nextArm == null ||
+                    prevArm.positions_rad == null || nextArm.positions_rad == null)
+                    continue;
+
+                double[] interp = new double[6];
+                for (int j = 0; j < 6; j++)
+                {
+                    interp[j] = (1d - alpha) * prevArm.positions_rad[j] + alpha * nextArm.positions_rad[j];
+                }
+
+                // 弧度转角度
+                double[] deg = interp.Select(r => r * Mathf.Rad2Deg).ToArray();
+                _animPlatform.SendMessage($"SetArm{armIdx}Angles", deg);
+
+                if (armIdx == 1) arm1Angles = deg;
+            }
+
+            // UI 回调
+            if (arm1Angles != null)
+                OnArmAnglesChanged?.Invoke(arm1Angles);
+
+            // 进度归一化
+            if (points.Length > 0)
+                ArmProgress = (_time / points[^1].t) % 1f;
+            OnArmProgressChanged?.Invoke(ArmProgress);
         }
     }
 
@@ -459,5 +651,17 @@ namespace FPT.Business
         public float AngleOfAttackDeg;
         public float LiftN;
         public float AltitudeM;
+    }
+
+    public readonly struct ArmVisibilityCommand
+    {
+        public readonly int ArmIndex;
+        public readonly bool Visible;
+
+        public ArmVisibilityCommand(int armIndex, bool visible)
+        {
+            ArmIndex = armIndex;
+            Visible = visible;
+        }
     }
 }
