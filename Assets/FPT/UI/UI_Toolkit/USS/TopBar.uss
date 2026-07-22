@@ -1,7 +1,7 @@
 .top-bar {
     height: var(--topbar-height);
     min-height: var(--topbar-height);
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: rgba(224, 240, 255, 0.70);
     flex-direction: row;
     align-items: center;
     padding-left: 14px;
@@ -40,7 +40,7 @@
 
 .top-bar-device {
     font-size: 22px;
-    color: var(--color-accent);
+    color: rgb(20, 90, 190);
     -unity-font-style: bold;
     -unity-text-align: middle-center;
 }
@@ -75,7 +75,7 @@
 .status-pill {
     flex-direction: row;
     align-items: center;
-    background-color: rgba(100, 116, 139, 0.1);
+    background-color: rgba(216, 235, 255, 0.48);
     border-width: 1px;
     border-color: rgba(100, 116, 139, 0.35);
     border-radius: 999px;
@@ -87,13 +87,13 @@
 }
 
 .status-pill.connected {
-    background-color: rgba(0, 168, 190, 0.1);
-    border-color: rgba(0, 168, 190, 0.4);
+    background-color: rgba(0, 156, 206, 0.14);
+    border-color: rgba(0, 156, 206, 0.42);
 }
 
 .status-pill.error,
 .status-pill.disconnected {
-    background-color: rgba(220, 60, 50, 0.1);
+    background-color: rgba(220, 60, 50, 0.12);
     border-color: rgba(220, 60, 50, 0.35);
 }
 
@@ -133,12 +133,14 @@
 
 .nav-button:hover {
     color: var(--color-accent);
-    background-color: rgba(88, 166, 255, 0.1);
+    background-color: rgba(216, 235, 255, 0.52);
 }
 
 .nav-button.nav-active {
     color: white;
-    background-color: var(--color-accent);
+    background-color: rgba(25, 103, 206, 0.86);
+    border-width: 1px;
+    border-color: rgba(174, 215, 255, 0.70);
 }
 
 /* === 顶栏 Logo 徽标 === */
@@ -148,7 +150,7 @@
     border-radius: 7px;
     border-width: 1px;
     border-color: var(--color-accent);
-    background-color: rgba(30, 120, 230, 0.08);
+    background-color: rgba(216, 235, 255, 0.56);
     align-items: center;
     justify-content: center;
     margin-right: 10px;
@@ -164,9 +166,9 @@
 .badge {
     flex-direction: row;
     align-items: center;
-    background-color: rgba(0, 168, 190, 0.1);
+    background-color: rgba(0, 156, 206, 0.14);
     border-width: 1px;
-    border-color: rgba(0, 168, 190, 0.4);
+    border-color: rgba(0, 156, 206, 0.42);
     border-radius: 6px;
     padding-top: 3px;
     padding-bottom: 3px;

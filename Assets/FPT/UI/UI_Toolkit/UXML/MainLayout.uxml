@@ -259,6 +259,25 @@
                     <ui:Label text="TELEMETRY" class="panel-header-sub" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-section">
+                    <ui:Label text="样机单独显示" class="section-title" />
+                    <ui:VisualElement class="prototype-button-row">
+                        <ui:Button name="PrototypeButtonAll" text="全部显示" class="prototype-button prototype-button-active" />
+                        <ui:Button name="PrototypeButton1" text="样机 1" class="prototype-button" />
+                        <ui:Button name="PrototypeButton2" text="样机 2" class="prototype-button" />
+                        <ui:Button name="PrototypeButton3" text="样机 3" class="prototype-button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="data-section">
+                    <ui:Label text="局部放大" class="section-title" />
+                    <ui:VisualElement class="closeup-card">
+                        <ui:VisualElement class="closeup-head">
+                            <ui:Label name="PrototypeCloseupTitle" text="全部样机 · 实时特写" class="closeup-title" />
+                            <ui:Label text="LIVE" class="closeup-badge" />
+                        </ui:VisualElement>
+                        <ui:Image name="PrototypeCloseupImage" class="closeup-image" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="data-section">
                     <ui:Label text="扑翼无人机飞行参数" class="section-title" />
                     <ui:VisualElement class="chart-card">
                         <ui:VisualElement class="chart-head">
@@ -280,20 +299,6 @@
                             <ui:Label name="DroneSpeedLabel" text="-- m/s" class="chart-value" />
                         </ui:VisualElement>
                         <ui:VisualElement name="ChartSpeed" class="chart-plot" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="chart-card">
-                        <ui:VisualElement class="chart-head">
-                            <ui:Label text="攻角" class="chart-title" />
-                            <ui:Label name="DroneAoaLabel" text="--°" class="chart-value" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="ChartAoa" class="chart-plot" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="chart-card">
-                        <ui:VisualElement class="chart-head">
-                            <ui:Label text="升力" class="chart-title" />
-                            <ui:Label name="DroneLiftLabel" text="-- N" class="chart-value" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="ChartLift" class="chart-plot" />
                     </ui:VisualElement>
                     <ui:VisualElement class="chart-card">
                         <ui:VisualElement class="chart-head">

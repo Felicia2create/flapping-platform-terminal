@@ -32,8 +32,15 @@ namespace FPT.UI
         private readonly Label[] _jointLabels = new Label[6];
 
         // 飞行参数数值 + 折线图
-        private readonly Label _freqVal, _ampVal, _speedVal, _aoaVal, _liftVal, _altVal;
-        private readonly MiniLineChart _freqChart, _ampChart, _speedChart, _aoaChart, _liftChart, _altChart;
+        private readonly Label _freqVal, _ampVal, _speedVal, _altVal;
+        private readonly Label _closeupTitle;
+        private readonly Image _closeupImage;
+        private readonly MiniLineChart _freqChart, _ampChart, _speedChart, _altChart;
+        private readonly Button[] _prototypeButtons = new Button[3];
+        private readonly System.Action[] _prototypeClickHandlers = new System.Action[3];
+        private readonly Button _showAllPrototypesButton;
+        private System.Action _showAllPrototypesHandler;
+        private int _activePrototypeIndex = 0;
 
         private const int ChartCapacity = 150;
 
@@ -85,6 +92,7 @@ namespace FPT.UI
             {
                 _modeSelector = new DropdownField(_modeOptions, GetModeIndex(demo.CurrentMode));
                 _modeSelector.AddToClassList("speed-slider");
+                _modeSelector.AddToClassList("animation-mode-dropdown");
                 _modeSelector.style.flexGrow = 1;
                 modeContainer.Add(_modeSelector);
 
@@ -146,9 +154,11 @@ namespace FPT.UI
             _freqVal = root.Q<Label>("DroneFreqLabel");
             _ampVal = root.Q<Label>("DroneAmpLabel");
             _speedVal = root.Q<Label>("DroneSpeedLabel");
-            _aoaVal = root.Q<Label>("DroneAoaLabel");
-            _liftVal = root.Q<Label>("DroneLiftLabel");
             _altVal = root.Q<Label>("DroneAltLabel");
+            _closeupTitle = root.Q<Label>("PrototypeCloseupTitle");
+            _closeupImage = root.Q<Image>("PrototypeCloseupImage");
+            if (_closeupImage != null)
+                _closeupImage.image = _demo.CloseupTexture;
 
             // 飞行参数折线图
             var accent = new Color(0.12f, 0.47f, 0.90f);
@@ -156,9 +166,25 @@ namespace FPT.UI
             _freqChart = new MiniLineChart(root.Q("ChartFreq"), ChartCapacity, accent);
             _ampChart = new MiniLineChart(root.Q("ChartAmp"), ChartCapacity, accent2);
             _speedChart = new MiniLineChart(root.Q("ChartSpeed"), ChartCapacity, accent);
-            _aoaChart = new MiniLineChart(root.Q("ChartAoa"), ChartCapacity, accent2);
-            _liftChart = new MiniLineChart(root.Q("ChartLift"), ChartCapacity, accent);
             _altChart = new MiniLineChart(root.Q("ChartAlt"), ChartCapacity, accent2);
+
+            _showAllPrototypesButton = root.Q<Button>("PrototypeButtonAll");
+            if (_showAllPrototypesButton != null)
+            {
+                _showAllPrototypesHandler = ShowAllPrototypes;
+                _showAllPrototypesButton.clicked += _showAllPrototypesHandler;
+            }
+
+            for (int i = 0; i < _prototypeButtons.Length; i++)
+            {
+                int armIndex = i + 1;
+                _prototypeButtons[i] = root.Q<Button>($"PrototypeButton{armIndex}");
+                if (_prototypeButtons[i] != null)
+                {
+                    _prototypeClickHandlers[i] = () => SelectPrototype(armIndex);
+                    _prototypeButtons[i].clicked += _prototypeClickHandlers[i];
+                }
+            }
 
             // 订阅底层事件
             _demo.OnArmPlayStateChanged += OnPlayStateChanged;
@@ -226,15 +252,11 @@ namespace FPT.UI
             if (_freqVal != null) _freqVal.text = $"{f.FlapFrequencyHz:F2} Hz";
             if (_ampVal != null) _ampVal.text = $"{f.FlapAmplitudeDeg:F0}°";
             if (_speedVal != null) _speedVal.text = $"{f.AirspeedMps:F2} m/s";
-            if (_aoaVal != null) _aoaVal.text = $"{f.AngleOfAttackDeg:F1}°";
-            if (_liftVal != null) _liftVal.text = $"{f.LiftN:F1} N";
             if (_altVal != null) _altVal.text = $"{f.AltitudeM:F2} m";
 
             _freqChart.Push(f.FlapFrequencyHz);
             _ampChart.Push(f.FlapAmplitudeDeg);
             _speedChart.Push(f.AirspeedMps);
-            _aoaChart.Push(f.AngleOfAttackDeg);
-            _liftChart.Push(f.LiftN);
             _altChart.Push(f.AltitudeM);
         }
 
@@ -243,9 +265,48 @@ namespace FPT.UI
             _freqChart?.Clear();
             _ampChart?.Clear();
             _speedChart?.Clear();
-            _aoaChart?.Clear();
-            _liftChart?.Clear();
             _altChart?.Clear();
+        }
+
+        private void SelectPrototype(int armIndex)
+        {
+            if (armIndex < 1 || armIndex > _prototypeButtons.Length) return;
+
+            _activePrototypeIndex = armIndex;
+            _demo.ShowPrototypeOnly(armIndex);
+            UpdateCloseupTitle();
+            UpdatePrototypeButtons();
+        }
+
+        private void ShowAllPrototypes()
+        {
+            _activePrototypeIndex = 0;
+            _demo.ShowAllPrototypes();
+            UpdateCloseupTitle();
+            UpdatePrototypeButtons();
+        }
+
+        private void UpdateCloseupTitle()
+        {
+            if (_closeupTitle == null) return;
+            _closeupTitle.text = _activePrototypeIndex == 0
+                ? "全部样机 · 实时特写"
+                : $"样机 {_activePrototypeIndex} · 实时特写";
+        }
+
+        private void UpdatePrototypeButtons()
+        {
+            if (_showAllPrototypesButton != null)
+                _showAllPrototypesButton.EnableInClassList("prototype-button-active", _activePrototypeIndex == 0);
+
+            for (int i = 0; i < _prototypeButtons.Length; i++)
+            {
+                var button = _prototypeButtons[i];
+                if (button == null) continue;
+
+                button.EnableInClassList("prototype-button-active", i + 1 == _activePrototypeIndex);
+                button.text = $"样机 {i + 1}";
+            }
         }
 
         private void OnPlayClicked()
@@ -275,6 +336,9 @@ namespace FPT.UI
 
             if (_playBtn != null)
                 _playBtn.text = _isPlaying ? "⏸ 暂停" : "▶ 播放";
+
+            UpdateCloseupTitle();
+            UpdatePrototypeButtons();
         }
 
         public void Dispose()
@@ -286,6 +350,13 @@ namespace FPT.UI
                 _demo.OnFlightParamsChanged -= OnFlightParams;
             }
             if (_playBtn != null) _playBtn.clicked -= OnPlayClicked;
+            if (_showAllPrototypesButton != null && _showAllPrototypesHandler != null)
+                _showAllPrototypesButton.clicked -= _showAllPrototypesHandler;
+            for (int i = 0; i < _prototypeButtons.Length; i++)
+            {
+                if (_prototypeButtons[i] != null && _prototypeClickHandlers[i] != null)
+                    _prototypeButtons[i].clicked -= _prototypeClickHandlers[i];
+            }
         }
     }
 }

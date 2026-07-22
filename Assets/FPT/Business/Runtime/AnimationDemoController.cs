@@ -45,6 +45,16 @@ namespace FPT.Business
         //  内部数据
         // ═══════════════════════════════════════════
 
+        [Header("特写镜头")]
+        [SerializeField] private int _closeupTextureWidth = 512;
+        [SerializeField] private int _closeupTextureHeight = 288;
+        [SerializeField] private float _closeupDistance = 0.85f;
+        [SerializeField] private float _closeupHeight = 0.42f;
+
+        // ═══════════════════════════════════════════
+        //  内部数据
+        // ═══════════════════════════════════════════
+
         private AnimationTrajectoryData _trajectoryData;
 
         // ═══════════════════════════════════════════
@@ -88,6 +98,8 @@ namespace FPT.Business
             set => _plateSpeed = value;
         }
 
+        public RenderTexture CloseupTexture => _closeupTexture;
+
         // ═══════════════════════════════════════════
         //  状态
         // ═══════════════════════════════════════════
@@ -117,6 +129,9 @@ namespace FPT.Business
         private Renderer[] _animRenderers;
         private LineRenderer[] _animLineRenderers;
         private TrailRenderer[] _animTrailRenderers;
+        private int _activePrototypeIndex = 0;
+        private Camera _closeupCamera;
+        private RenderTexture _closeupTexture;
 
         // ═══════════════════════════════════════════
         //  生命周期
@@ -137,6 +152,7 @@ namespace FPT.Business
             _animRenderers = _animPlatformRoot?.GetComponentsInChildren<Renderer>() ?? new Renderer[0];
             _animLineRenderers = _animPlatformRoot?.GetComponentsInChildren<LineRenderer>() ?? new LineRenderer[0];
             _animTrailRenderers = _animPlatformRoot?.GetComponentsInChildren<TrailRenderer>() ?? new TrailRenderer[0];
+            CreateCloseupCamera();
 
             // 默认隐藏动画相关元素：控制面板模式下不可见
             SetRenderersEnabled(_animRenderers, false);
@@ -164,6 +180,7 @@ namespace FPT.Business
             SetRenderersEnabled(_animRenderers, true);
             SetLineRenderersEnabled(_animLineRenderers, true);
             SetTrailRenderersEnabled(_animTrailRenderers, true);
+            ApplyPrototypeVisibility();
             _animPlatformRoot?.BroadcastMessage("SetTrailsEnabled", true, SendMessageOptions.DontRequireReceiver);
         }
 
@@ -175,6 +192,129 @@ namespace FPT.Business
             SetLineRenderersEnabled(_animLineRenderers, false);
             SetTrailRenderersEnabled(_animTrailRenderers, false);
             _animPlatformRoot?.BroadcastMessage("SetTrailsEnabled", false, SendMessageOptions.DontRequireReceiver);
+        }
+
+        public void ShowPrototypeOnly(int prototypeIndex)
+        {
+            if (prototypeIndex < 1 || prototypeIndex > 3) return;
+
+            _activePrototypeIndex = prototypeIndex;
+            ApplyPrototypeVisibility();
+            UpdateCloseupCamera();
+        }
+
+        public void ShowAllPrototypes()
+        {
+            _activePrototypeIndex = 0;
+            ApplyPrototypeVisibility();
+            UpdateCloseupCamera();
+        }
+
+        private void SetPrototypeVisible(int prototypeIndex, bool visible)
+        {
+            _animPlatformRoot?.BroadcastMessage(
+                "SetArmVisible",
+                new ArmVisibilityCommand(prototypeIndex, visible),
+                SendMessageOptions.DontRequireReceiver
+            );
+        }
+
+        private void ApplyPrototypeVisibility()
+        {
+            for (int prototypeIndex = 1; prototypeIndex <= 3; prototypeIndex++)
+                SetPrototypeVisible(prototypeIndex, _activePrototypeIndex == 0 || prototypeIndex == _activePrototypeIndex);
+        }
+
+        private void CreateCloseupCamera()
+        {
+            if (_closeupTexture == null)
+            {
+                _closeupTexture = new RenderTexture(_closeupTextureWidth, _closeupTextureHeight, 16)
+                {
+                    name = "PrototypeCloseupTexture",
+                    antiAliasing = 2
+                };
+            }
+
+            if (_closeupCamera != null) return;
+
+            var cameraObject = new GameObject("PrototypeCloseupCamera");
+            cameraObject.transform.SetParent(transform, false);
+            _closeupCamera = cameraObject.AddComponent<Camera>();
+            _closeupCamera.targetTexture = _closeupTexture;
+            _closeupCamera.clearFlags = CameraClearFlags.Skybox;
+            _closeupCamera.fieldOfView = 24f;
+            _closeupCamera.depth = -20f;
+            _closeupCamera.enabled = true;
+
+            var mainCamera = Camera.main;
+            if (mainCamera != null)
+            {
+                _closeupCamera.cullingMask = mainCamera.cullingMask;
+                _closeupCamera.clearFlags = mainCamera.clearFlags;
+                _closeupCamera.backgroundColor = mainCamera.backgroundColor;
+            }
+
+            UpdateCloseupCamera();
+        }
+
+        private void LateUpdate()
+        {
+            UpdateCloseupCamera();
+        }
+
+        private void UpdateCloseupCamera()
+        {
+            if (_closeupCamera == null || _animPlatformRoot == null) return;
+            if (!TryGetCloseupBounds(out var bounds)) return;
+
+            var focus = bounds.center;
+            var size = Mathf.Max(bounds.extents.magnitude, 0.35f);
+            var distance = Mathf.Max(_closeupDistance, size * 1.05f);
+            var direction = new Vector3(0.75f, 0.45f, -1f).normalized;
+
+            _closeupCamera.transform.position = focus - direction * distance + Vector3.up * _closeupHeight;
+            _closeupCamera.transform.LookAt(focus + Vector3.up * Mathf.Min(size * 0.35f, 0.45f));
+        }
+
+        private bool TryGetCloseupBounds(out Bounds bounds)
+        {
+            bool hasBounds = false;
+            bounds = new Bounds(_animPlatformRoot.transform.position, Vector3.one);
+
+            foreach (var renderer in _animRenderers)
+            {
+                if (renderer == null || !ShouldIncludeInCloseup(renderer)) continue;
+
+                if (!hasBounds)
+                {
+                    bounds = renderer.bounds;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(renderer.bounds);
+                }
+            }
+
+            return hasBounds;
+        }
+
+        private bool ShouldIncludeInCloseup(Renderer renderer)
+        {
+            if (_activePrototypeIndex == 0) return true;
+            return GetTransformPath(renderer.transform).Contains($"arm{_activePrototypeIndex}_");
+        }
+
+        private static string GetTransformPath(Transform transform)
+        {
+            var path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                path = transform.name + "/" + path;
+            }
+            return path;
         }
 
         private static void SetRenderersEnabled(MeshRenderer[] renderers, bool enabled)
@@ -199,6 +339,18 @@ namespace FPT.Business
         {
             foreach (var r in renderers)
                 if (r != null) r.enabled = enabled;
+        }
+
+        private void OnDestroy()
+        {
+            if (_closeupCamera != null)
+                Destroy(_closeupCamera.gameObject);
+
+            if (_closeupTexture != null)
+            {
+                _closeupTexture.Release();
+                Destroy(_closeupTexture);
+            }
         }
 
         // ═══════════════════════════════════════════
@@ -503,5 +655,18 @@ namespace FPT.Business
         public float AngleOfAttackDeg;
         public float LiftN;
         public float AltitudeM;
+    }
+
+
+    public readonly struct ArmVisibilityCommand
+    {
+        public readonly int ArmIndex;
+        public readonly bool Visible;
+
+        public ArmVisibilityCommand(int armIndex, bool visible)
+        {
+            ArmIndex = armIndex;
+            Visible = visible;
+        }
     }
 }

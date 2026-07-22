@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FPT.Business;
 using UnityEngine;
 
 namespace FPT.Visualization
@@ -11,6 +12,7 @@ namespace FPT.Visualization
 
         // _arms[1] = arm1 的 6 个 ArticulationBody, _arms[2] = arm2, _arms[3] = arm3
         private readonly Dictionary<int, ArticulationBody[]> _arms = new();
+        private readonly Dictionary<int, Renderer[]> _armRenderers = new();
 
         public int ArmCount => _arms.Count;
         public bool IsReady => _plateJoint != null;
@@ -20,6 +22,7 @@ namespace FPT.Visualization
             if (_platformRoot == null)
                 _platformRoot = gameObject;
             DiscoverJoints();
+            CacheArmRenderers();
             Debug.Log($"[AnimationPlatformController] 发现转台 + {ArmCount} 个机械臂");
         }
 
@@ -37,6 +40,15 @@ namespace FPT.Visualization
         {
             if (_plateJoint != null)
                 SetDrive(_plateJoint, (float)angleDegrees);
+        }
+
+        public void SetArmVisible(ArmVisibilityCommand command)
+        {
+            if (!_armRenderers.TryGetValue(command.ArmIndex, out var renderers)) return;
+
+            foreach (var renderer in renderers)
+                if (renderer != null)
+                    renderer.enabled = command.Visible;
         }
 
         private void SetDrive(ArticulationBody body, float deg)
@@ -70,6 +82,46 @@ namespace FPT.Visualization
                     }
                 }
             }
+        }
+
+        private void CacheArmRenderers()
+        {
+            _armRenderers.Clear();
+
+            for (int arm = 1; arm <= 3; arm++)
+            {
+                var renderers = new HashSet<Renderer>();
+
+                if (_arms.TryGetValue(arm, out var bodies))
+                {
+                    foreach (var body in bodies)
+                    {
+                        if (body == null) continue;
+                        foreach (var renderer in body.GetComponentsInChildren<Renderer>(true))
+                            renderers.Add(renderer);
+                    }
+                }
+
+                string armToken = $"arm{arm}_";
+                foreach (var renderer in _platformRoot.GetComponentsInChildren<Renderer>(true))
+                {
+                    if (renderer != null && GetTransformPath(renderer.transform).Contains(armToken))
+                        renderers.Add(renderer);
+                }
+
+                _armRenderers[arm] = new List<Renderer>(renderers).ToArray();
+            }
+        }
+
+        private static string GetTransformPath(Transform transform)
+        {
+            var path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                path = transform.name + "/" + path;
+            }
+            return path;
         }
 
         // ── SendMessage 兼容：单参数方法 ──

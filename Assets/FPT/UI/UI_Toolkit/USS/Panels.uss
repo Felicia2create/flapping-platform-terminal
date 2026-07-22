@@ -113,7 +113,7 @@
 .status-bar {
     height: var(--statusbar-height);
     min-height: var(--statusbar-height);
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: rgba(224, 240, 255, 0.68);
     flex-direction: row;
     align-items: center;
     padding-left: 12px;
@@ -148,7 +148,7 @@
     padding: 3px 6px;
     margin: 2px 0;
     border-radius: var(--radius);
-    background-color: var(--color-surface);
+    background-color: rgba(216, 235, 255, 0.58);
 }
 
 .plan-status {
@@ -172,7 +172,7 @@
 .confirm-button {
     font-size: var(--font-size-sm);
     color: white;
-    background-color: var(--color-accent2);
+    background-color: rgba(0, 156, 206, 0.86);
     border-width: 0;
     border-radius: var(--radius);
     padding-top: 5px;
@@ -190,7 +190,7 @@
 .cancel-button {
     font-size: var(--font-size-sm);
     color: var(--color-text);
-    background-color: var(--color-surface);
+    background-color: rgba(216, 235, 255, 0.62);
     border-width: 1px;
     border-color: var(--color-border);
     border-radius: var(--radius);
@@ -213,7 +213,7 @@
 
 .left-panel-anim {
     width: 200px;
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: var(--color-panel);
     border-width: 1px;
     border-color: var(--color-border);
     border-radius: var(--radius);
@@ -230,7 +230,7 @@
 
 .right-panel-anim {
     width: 300px;
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: var(--color-panel);
     border-width: 1px;
     border-color: var(--color-border);
     border-radius: var(--radius);
@@ -276,12 +276,12 @@
     font-size: var(--font-size-sm);
     padding: 4px 8px;
     border-radius: var(--radius);
-    background-color: var(--color-surface);
+    background-color: rgba(216, 235, 255, 0.62);
     color: var(--color-text-dim);
     margin-bottom: 6px;
 }
 .animation-status.playing {
-    color: var(--color-accent2);
+    color: rgb(0, 126, 180);
 }
 .animation-status.paused {
     color: var(--color-warning);
@@ -290,15 +290,16 @@
 .play-button {
     font-size: var(--font-size-lg);
     color: var(--color-text-light);
-    background-color: var(--color-accent2);
-    border-width: 0;
+    background-color: rgba(0, 156, 206, 0.88);
+    border-width: 1px;
+    border-color: rgba(184, 232, 255, 0.70);
     border-radius: 9px;
     padding: 12px;
     margin-top: 10px;
     -unity-font-style: bold;
 }
 .play-button:hover {
-    background-color: rgb(50, 160, 70);
+    background-color: rgba(25, 103, 206, 0.90);
 }
 
 .speed-row {
@@ -308,6 +309,111 @@
 .speed-slider {
     flex-grow: 1;
 }
+
+.animation-mode-dropdown .unity-base-popup-field__input,
+.animation-mode-dropdown .unity-base-field__input {
+    font-size: var(--font-size);
+    color: rgb(16, 73, 150);
+    -unity-font-style: bold;
+    background-color: rgba(216, 235, 255, 0.72);
+    border-width: 1px;
+    border-color: rgba(25, 103, 206, 0.62);
+    border-radius: 6px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.animation-mode-dropdown .unity-base-popup-field__input:hover,
+.animation-mode-dropdown .unity-base-field__input:hover {
+    background-color: rgba(232, 245, 255, 0.86);
+    border-color: rgb(12, 72, 156);
+}
+
+.prototype-button-row {
+    flex-direction: row;
+}
+
+.prototype-button {
+    flex-grow: 1;
+    font-size: 12px;
+    color: rgb(16, 73, 150);
+    background-color: rgba(216, 235, 255, 0.62);
+    border-width: 1px;
+    border-color: rgba(25, 103, 206, 0.48);
+    border-radius: 6px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-left: 3px;
+    margin-right: 3px;
+    -unity-font-style: bold;
+}
+
+.prototype-button:hover {
+    background-color: rgba(232, 245, 255, 0.82);
+}
+
+.prototype-button.prototype-button-active {
+    color: var(--color-text-light);
+    background-color: rgba(25, 103, 206, 0.90);
+    border-color: rgba(184, 232, 255, 0.78);
+}
+
+.closeup-card {
+    background-color: rgba(12, 42, 82, 0.18);
+    border-width: 1px;
+    border-color: rgba(184, 232, 255, 0.52);
+    border-radius: 8px;
+    padding-top: 7px;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin-bottom: 6px;
+}
+
+.closeup-head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.closeup-title {
+    font-size: var(--font-size-sm);
+    color: rgb(18, 72, 150);
+    -unity-font-style: bold;
+}
+
+.closeup-badge {
+    font-size: 11px;
+    color: white;
+    background-color: rgba(0, 156, 206, 0.86);
+    border-width: 1px;
+    border-color: rgba(184, 232, 255, 0.62);
+    border-radius: 999px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 7px;
+    padding-right: 7px;
+    -unity-font-style: bold;
+}
+
+.closeup-image {
+    align-self: stretch;
+    width: 100%;
+    height: 220px;
+    background-color: rgba(8, 24, 48, 0.24);
+    border-width: 1px;
+    border-color: rgba(86, 155, 232, 0.34);
+    border-radius: 0;
+    -unity-background-scale-mode: scale-and-crop;
+}
+
 .speed-value {
     font-size: var(--font-size);
     color: var(--color-accent);
@@ -352,9 +458,9 @@
 
 /* ── 飞行参数折线图卡片（X 轴=时间） ── */
 .chart-card {
-    background-color: rgba(230, 240, 252, 0.55);
+    background-color: rgba(216, 235, 255, 0.50);
     border-width: 1px;
-    border-color: rgba(30, 120, 230, 0.12);
+    border-color: rgba(86, 155, 232, 0.24);
     border-radius: 6px;
     padding-top: 6px;
     padding-bottom: 6px;
@@ -372,7 +478,7 @@
 
 .chart-title {
     font-size: var(--font-size-sm);
-    color: var(--color-text-dim);
+    color: rgba(75, 103, 142, 0.86);
     -unity-font-style: bold;
 }
 
