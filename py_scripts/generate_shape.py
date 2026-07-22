@@ -7,7 +7,10 @@ generate_formations.py
 生成包含多关键帧的 formation_trajectory.json。
 
 用法：
-    uv run python scripts/generate_formations.py
+    uv run python py_scripts/generate_shape.py
+
+把 "py_scripts\Scheduled trajectory\formation_trajectory.json" 复制到
+"Assets\Resources\formation_trajectory.json" 路径下
 """
 
 import json
@@ -50,23 +53,68 @@ ARM_BASE_ANGLES_RAD = {
 # ── 阵型目标坐标 (世界坐标系，Z轴朝上，X轴朝前) ──
 
 # 1. 人字形 (V-Shape): 领头鸟在前，双翼在后侧展开
+#    Z 轴抬升至 ≥0.80，远离底盘，防止穿模
 V_SHAPE_TARGETS = {
-    1: np.array([0.50, 0.00, 0.60]),  # 领头
-    2: np.array([-0.25, 0.60, 0.35]),  # 左后翼
-    3: np.array([-0.25, -0.60, 0.35]),  # 右后翼
+    1: np.array([0.50, 0.00, 0.85]),  # 领头
+    2: np.array([-0.25, 0.60, 0.80]),  # 左后翼
+    3: np.array([-0.25, -0.60, 0.80]),  # 右后翼
 }
 
 # 2. 丫字形 (Y-Shape): 领头鸟在中心高点，双翼向斜后方高举展开
+#    Z 轴抬升至 ≥0.85，远离底盘，防止穿模
 Y_SHAPE_TARGETS = {
-    1: np.array([0.10, 0.00, 0.70]),  # 中心高点
-    2: np.array([-0.40, 0.50, 0.55]),  # 左后高位展开
-    3: np.array([-0.40, -0.50, 0.55]),  # 右后高位展开
+    1: np.array([0.10, 0.00, 0.90]),  # 中心高点
+    2: np.array([-0.40, 0.50, 0.85]),  # 左后高位展开
+    3: np.array([-0.40, -0.50, 0.85]),  # 右后高位展开
 }
 
 # ── 初始种子姿态 (Seed State) ──
 # 避免传入全零角度，提供一个“半展翅”初始姿态，引导 IK 求解器得出对称、一致的肘部姿态。
 # 包含 7 个元素 (对应 ikpy 内部的 origin link + 6 个实际关节)
-SEED_ANGLES = [0.0, 0.0, math.pi / 4, -math.pi / 4, 0.0, math.pi / 2, 0.0]
+# 注意：种子值必须在 JOINT_SAFETY_BOUNDS 范围内，否则 IK 初始化失败
+#   links[2] Joint2 ∈ [-2.5, -0.3] → 选 -1.5
+#   links[3] Joint3 ∈ [0.0, 2.5]   → 选 1.0
+SEED_ANGLES = [0.0, 0.0, -1.5, 1.0, 0.0, math.pi / 2, 0.0]
+
+# ── 关节安全限位 (Anti-Clipping) ──
+# 在 URDF 原始限位基础上进一步收紧，防止机械臂大臂垂向底盘
+# 索引对应 chain.links 中的位置：links[2]=Joint2, links[3]=Joint3
+JOINT_SAFETY_BOUNDS = {
+    2: (-2.5, -0.3),  # Joint2: 限制在负角度范围，保持大臂上扬
+    3: (0.0, 2.5),  # Joint3: 禁止负角度，防止肘部向下穿透底盘
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ROS → Unity 坐标系转换
+# ═══════════════════════════════════════════════════════════════
+#
+# 关节角度映射规则：
+#   - ROS 右手系 (Z-up)  →  Unity 左手系 (Y-up)
+#   - URDF 导入器已处理关节轴的坐标系转换
+#   - ArticulationBody.xDrive 的旋转方向与 URDF 定义一致
+#   - 因此关节角度值无需翻转符号，直接透传即可
+#
+# 本函数保留为显式转换入口，便于将来调试和调整。
+
+
+def convert_angles_ros_to_unity(angles_rad: list) -> list:
+    """
+    将 ROS 右手系下的关节弧度转换为 Unity 左手系兼容格式。
+
+    当前实现：恒等映射（透传）。
+    原因：URDF 导入器已处理坐标系转换，
+          ArticulationBody.xDrive 的旋转方向与 URDF 定义一致。
+
+    参数:
+        angles_rad: 6 元素列表，ROS 坐标系下的关节弧度
+    返回:
+        6 元素列表，Unity 兼容的关节弧度
+    """
+    # 恒等映射：无需翻转符号
+    # 如需调试，可在此处对特定关节取反，例如：
+    #   angles_rad[5] = -angles_rad[5]  # Joint6 轴为 -Z，可能需要翻转
+    return list(angles_rad)
+
 
 # ═══════════════════════════════════════════════════════════════
 # 数学工具函数
@@ -107,10 +155,22 @@ def get_arm_base_transform(arm_index: int) -> np.ndarray:
 
 
 def world_to_arm_base(target_world: np.ndarray, arm_index: int) -> np.ndarray:
+    """
+    将世界坐标系中的目标位姿转换到臂底座坐标系。
+
+    返回 4x4 齐次变换矩阵：
+      - 位置列 (:,3) = 目标世界坐标
+      - 旋转矩阵 (:3,:3) = 单位阵（X前 Y左 Z上，即末端水平、朝前）
+    """
     T_base_world = get_arm_base_transform(arm_index)
     T_world_base = np.linalg.inv(T_base_world)
+
+    # 目标在世界坐标系中的位姿：
+    #   方向：X轴=前, Y轴=左, Z轴=上（即末端水平、指向 +X）
+    #   位置：target_world
     target_pose_world = np.eye(4)
     target_pose_world[:3, 3] = target_world
+
     return T_world_base @ target_pose_world
 
 
@@ -120,19 +180,25 @@ def world_to_arm_base(target_world: np.ndarray, arm_index: int) -> np.ndarray:
 
 
 def solve_formation_ik(chain: Chain, shape_name: str, targets: dict) -> dict:
-    """为指定的阵型目标求解三个臂的 IK"""
+    """为指定的阵型目标求解三个臂的 IK（含姿态约束）"""
     print(f"\n[{shape_name}] 开始求解...")
     formation_data = {}
 
     for arm_idx in [1, 2, 3]:
         target_world = targets[arm_idx]
+        # 完整 4x4 目标位姿（位置 + 姿态），已转换到底座坐标系
         target_pose_base = world_to_arm_base(target_world, arm_idx)
-        target_pos = target_pose_base[:3, 3]
 
         try:
-            # 传入 SEED_ANGLES 强制姿态偏好
+            # ✅ 位置和姿态分开传参（ikpy API 要求）
+            #    target_position:  shape (3,)  → 目标 XYZ
+            #    target_orientation: shape (3,3) → 目标旋转矩阵（单位阵 = 水平朝前）
+            #    orientation_mode="all": 约束全部三个旋转轴
             joint_angles_rad = chain.inverse_kinematics(
-                target_pos, initial_position=SEED_ANGLES
+                target_position=target_pose_base[:3, 3],
+                target_orientation=target_pose_base[:3, :3],
+                orientation_mode="all",
+                initial_position=SEED_ANGLES,
             )
 
             # 截取 6 个有效关节
@@ -146,7 +212,7 @@ def solve_formation_ik(chain: Chain, shape_name: str, targets: dict) -> dict:
                 joint_angles_rad.append(0.0)
 
             formation_data[str(arm_idx)] = {
-                "positions_rad": joint_angles_rad,
+                "positions_rad": convert_angles_ros_to_unity(joint_angles_rad),
                 "target_world": target_world.tolist(),
             }
             print(f"  ✅ Arm {arm_idx} 成功 | 目标 Z={target_world[2]:.2f}")
@@ -181,6 +247,13 @@ def main():
     except Exception as e:
         print(f"❌ 加载 URDF 失败：{e}")
         return
+
+    # ── 收紧关节安全限位 (Anti-Clipping) ──
+    for joint_idx, (lb, ub) in JOINT_SAFETY_BOUNDS.items():
+        if joint_idx < len(chain.links):
+            old_bounds = chain.links[joint_idx].bounds
+            chain.links[joint_idx].bounds = (lb, ub)
+            print(f"  🔒 Joint {joint_idx} 限位: {old_bounds} → ({lb}, {ub})")
 
     # 准备要生成的阵型序列 (定义时间戳和对应的数据)
     formations_to_generate = [

@@ -3,6 +3,17 @@ using System;
 namespace FPT.Business
 {
     /// <summary>
+    /// JSON 轨迹循环播放模式
+    /// </summary>
+    public enum PlaybackLoopMode
+    {
+        /// <summary>Loop — 到达末尾后回到开头（V→Y→V→Y...）</summary>
+        Loop,
+        /// <summary>PingPong — 到达末尾后反向播放（V→Y→V→Y...）</summary>
+        PingPong
+    }
+
+    /// <summary>
     /// 阵型演示模式
     /// </summary>
     public enum DemoFormationMode

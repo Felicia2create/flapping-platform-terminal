@@ -57,6 +57,18 @@ namespace FPT.Business
 
         private AnimationTrajectoryData _trajectoryData;
 
+        // ── JSON 播放器专用字段 ──
+        private float _playbackTime;          // 播放时间轴（秒），只增不减
+        private float _prevJsonTime;          // 上一帧有效时间，用于检测 Loop 折返
+        private PlaybackLoopMode _loopMode = PlaybackLoopMode.PingPong;
+
+        /// <summary>循环模式（Inspector / UI 可设）</summary>
+        public PlaybackLoopMode LoopMode
+        {
+            get => _loopMode;
+            set => _loopMode = value;
+        }
+
         // ═══════════════════════════════════════════
         //  公共属性（供 Inspector / UI 使用）
         // ═══════════════════════════════════════════
@@ -379,6 +391,8 @@ namespace FPT.Business
             IsArmPaused = false;
             _plateActive = false;
             _time = 0;
+            _playbackTime = 0;
+            _prevJsonTime = 0;
             ArmProgress = 0;
             OnArmProgressChanged?.Invoke(0);
             OnArmPlayStateChanged?.Invoke(false);
@@ -469,6 +483,7 @@ namespace FPT.Business
             if (_currentMode == DemoFormationMode.VShape ||
                 _currentMode == DemoFormationMode.YShape)
             {
+                _playbackTime += Time.deltaTime * _baseSpeed;
                 DriveFromJson();
                 return;
             }
@@ -574,45 +589,79 @@ namespace FPT.Business
         }
 
         /// <summary>
-        /// JSON 驱动模式：插值计算当前时间的关节角度并发送给机械臂
+        /// JSON 驱动模式：基于 _playbackTime 在关键帧之间线性插值
+        /// - Loop：到达末尾后回到开头（V→Y→V→Y...）
+        /// - PingPong：到达末尾后反向播放（V→Y→V→Y...）
         /// </summary>
         private void DriveFromJson()
         {
             if (_trajectoryData == null || _trajectoryData.points == null || _trajectoryData.PointCount == 0)
-            {
-                // JSON 未加载，不走
                 return;
-            }
 
-            // 找到当前时间 _time 所在的前后两个点
             var points = _trajectoryData.points;
-            int prevIdx = 0, nextIdx = 0;
+            int n = points.Length;
+            float totalDuration = points[n - 1].t;
+            if (totalDuration <= 0f) return;
 
-            for (int i = 0; i < points.Length; i++)
+            // ── 1. 根据循环模式计算有效时间 ──
+            float effectiveT;
+            if (_loopMode == PlaybackLoopMode.PingPong)
             {
-                if (points[i].t <= _time)
-                {
-                    prevIdx = i;
-                }
-                else
-                {
-                    nextIdx = i;
-                    break;
-                }
+                // PingPong：_playbackTime 永远递增，Mathf.PingPong 自动振荡 0→T→0→T...
+                effectiveT = Mathf.PingPong(_playbackTime, totalDuration);
+            }
+            else
+            {
+                // Loop：取模折返 0→T→0→T...
+                effectiveT = _playbackTime % totalDuration;
             }
 
-            // 如果超出最后一个点，循环回开头
-            nextIdx = nextIdx % points.Length;
+            // ── 2. 找前后关键帧（支持 Loop 折返检测） ──
+            int prevIdx = n - 1;
+            int nextIdx = 0;
+
+            // 检测 Loop 折返：上一帧接近末尾、当前帧接近开头 → 跨边界插值
+            bool loopWrapped = _loopMode == PlaybackLoopMode.Loop
+                && _prevJsonTime > totalDuration * 0.5f
+                && effectiveT < totalDuration * 0.5f;
+
+            if (loopWrapped)
+            {
+                // 折返段：从最后一个点插值到第一个点
+                prevIdx = n - 1;
+                nextIdx = 0;
+            }
+            else
+            {
+                // 正常段：找 effectiveT 落在哪个区间
+                for (int i = 0; i < n; i++)
+                {
+                    if (points[i].t <= effectiveT)
+                        prevIdx = i;
+                    else
+                    {
+                        nextIdx = i;
+                        break;
+                    }
+                }
+                // 到达最后一个点之后：循环回第一个点
+                if (prevIdx == n - 1 && effectiveT >= points[n - 1].t)
+                    nextIdx = 0;
+            }
+
+            _prevJsonTime = effectiveT;
 
             var prev = points[prevIdx];
             var next = points[nextIdx];
-            
-            // 线性插值
-            float tTotal = next.t - prev.t;
-            if (tTotal <= 0f) tTotal = 1f;
-            float alpha = (_time - prev.t) / tTotal;
 
-            // 为每个臂插值并发送
+            // ── 3. 计算插值比例 alpha ──
+            float segStart = prev.t;
+            float segEnd = nextIdx > prevIdx ? next.t : totalDuration;
+            float segLen = segEnd - segStart;
+            if (segLen <= 0f) segLen = 1f;
+            float alpha = Mathf.Clamp01((effectiveT - segStart) / segLen);
+
+            // ── 4. 对 3 个臂的 6 个关节做线性插值 ──
             double[] arm1Angles = null;
             for (int armIdx = 1; armIdx <= 3; armIdx++)
             {
@@ -625,23 +674,22 @@ namespace FPT.Business
                 double[] interp = new double[6];
                 for (int j = 0; j < 6; j++)
                 {
-                    interp[j] = (1d - alpha) * prevArm.positions_rad[j] + alpha * nextArm.positions_rad[j];
+                    double a = prevArm.positions_rad[j];
+                    double b = nextArm.positions_rad[j];
+                    interp[j] = a + (b - a) * alpha;
                 }
 
-                // 弧度转角度
                 double[] deg = interp.Select(r => r * Mathf.Rad2Deg).ToArray();
                 _animPlatform.SendMessage($"SetArm{armIdx}Angles", deg);
 
                 if (armIdx == 1) arm1Angles = deg;
             }
 
-            // UI 回调
+            // ── 5. UI 回调 ──
             if (arm1Angles != null)
                 OnArmAnglesChanged?.Invoke(arm1Angles);
 
-            // 进度归一化
-            if (points.Length > 0)
-                ArmProgress = (_time / points[^1].t) % 1f;
+            ArmProgress = effectiveT / totalDuration;
             OnArmProgressChanged?.Invoke(ArmProgress);
         }
     }
