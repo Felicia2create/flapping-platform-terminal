@@ -28,9 +28,8 @@ imgui.ini
 .idea/
 *.sln.DotSettings.user
 
-# --- VS Code（仅保留 extensions.json）---
-.vscode/settings.json
-.vscode/launch.json
+# --- VS Code ---
+.vscode/
 
 # --- 操作系统 ---
 .DS_Store
@@ -40,3 +39,10 @@ Desktop.ini
 
 # --- Claude Code 本地配置 ---
 .claude/
+
+# --- Unity 包文件（已导入后不需要）---
+*.unitypackage
+
+# --- 临时/测试目录 ---
+123123/
+.tmp_resample

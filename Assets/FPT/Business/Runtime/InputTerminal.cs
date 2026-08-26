@@ -3,6 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using FPT.Communication;
 using FPT.Core;
+using RosSharp.RosBridgeClient.MessageTypes.FptInterface;
+using RosSharp.RosBridgeClient.MessageTypes.Geometry;
+using RosSharp.RosBridgeClient.MessageTypes.Sensor;
+
 using UnityEngine;
 
 namespace FPT.Business
@@ -16,7 +20,7 @@ namespace FPT.Business
 
     /// <summary>
     /// 输入终端 — 数据同步中枢
-    /// 保持 JointAngles ↔ EndEffectorPose 双向互通（通过 ROS2 FK/IK）
+    /// 保持 JointAngles ↔ EndEffectorPose 双向互通（通过 ROS2 Service）
     /// GhostArm 只读 JointAngles，UI 订阅事件同步回显
     /// </summary>
     public class InputTerminal
@@ -25,7 +29,7 @@ namespace FPT.Business
         public static readonly double[] ArmJointMinDeg = { -178, -178, -178, -178, -178, -180 };
         public static readonly double[] ArmJointMaxDeg = {  178,  178,  145,  178,  178,  180 };
 
-        private readonly Ros2PlanningBridge _ros2;
+        private readonly Ros2Node _node;
 
         // ═══ 数据 ═══
         public double[] JointAngles { get; private set; }        // 7 DOF（度）
@@ -46,15 +50,17 @@ namespace FPT.Business
         private CancellationTokenSource _debounceCts;
         private const float DebounceMs = 300f;
 
-        public InputTerminal(Ros2PlanningBridge ros2)
+        public InputTerminal(Ros2Node node)
         {
-            _ros2 = ros2;
+            _node = node;
             JointAngles = new double[7];
             EndEffectorPose = DevicePose.Identity;
 
-            _ros2.OnFkResult += OnFkResult;
-            _ros2.OnIkResult += OnIkResult;
-            _ros2.OnPlanStatus += OnPlanStatus;
+            // 订阅 /plan_status topic
+            _node.Subscribe<PlanStatus>("/plan_status", msg =>
+            {
+                OnPlanStatus(msg.status);
+            });
         }
 
         // ═══════════════════════════════════════════
@@ -107,7 +113,6 @@ namespace FPT.Business
             if (string.IsNullOrEmpty(frameId) || frameId == ReferenceFrame) return;
             ReferenceFrame = frameId;
 
-            // 如果在笛卡尔模式下已有目标，重新触发 IK（用新坐标系）
             if (ActiveMode == ControlMode.CartesianSpace && !_poseDirty)
             {
                 _poseDirty = true;
@@ -119,26 +124,52 @@ namespace FPT.Business
         // 执行
         // ═══════════════════════════════════════════
 
-        /// <summary> 确认执行 — 根据 ActiveMode 发不同话题 </summary>
-        public void ConfirmExecute()
+        /// <summary> 确认执行 — 根据 ActiveMode 调用不同 service </summary>
+        public async void ConfirmExecute()
         {
-            Debug.Log($"[InputTerminal] ConfirmExecute: mode={ActiveMode}, PlanReady={PlanReady}, JointAngles=[{string.Join(", ", JointAngles)}]");
+            Debug.Log($"[InputTerminal] ConfirmExecute: mode={ActiveMode}, PlanReady={PlanReady}");
 
             if (ActiveMode == ControlMode.JointSpace)
             {
-                _ros2.PublishJointCommand(JointAngles);
-                Debug.Log($"[InputTerminal] 关节空间确认: /joint_commands 已发送");
+                try
+                {
+                    // Step 1: joint_plan — 规划轨迹
+                    var jointMsg = JointTrajectoryMapper.CreateJointState(JointAngles, ReferenceFrame);
+                    var jointReq = new JointPlanRequest(jointMsg);
+                    await _node.CallServiceAsync<JointPlanResponse>("joint_plan", jointReq);
+                    Debug.Log("[InputTerminal] joint_plan 完成，开始执行...");
+
+                    // Step 2: execute — 执行轨迹
+                    var execReq = new ExecuteRequest(true);
+                    var execResp = await _node.CallServiceAsync<ExecuteResponse>("execute", execReq);
+                    Debug.Log($"[InputTerminal] execute 结果: success={execResp.success}, msg={execResp.message}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[InputTerminal] 执行失败: {ex.Message}");
+                    OnStatusChanged?.Invoke("failed");
+                }
             }
             else
             {
                 if (!PlanReady)
                 {
-                    Debug.LogWarning("[InputTerminal] 笛卡尔规划尚未就绪，无法执行 /execute");
+                    Debug.LogWarning("[InputTerminal] 笛卡尔规划尚未就绪，无法执行");
                     OnStatusChanged?.Invoke("failed");
                     return;
                 }
-                _ros2.PublishExecute();
-                Debug.Log("[InputTerminal] 笛卡尔空间确认: /execute 已发送");
+                // 调用 execute service
+                try
+                {
+                    var execReq = new ExecuteRequest(true);
+                    var execResp = await _node.CallServiceAsync<ExecuteResponse>("execute", execReq);
+                    Debug.Log($"[InputTerminal] execute service 结果: success={execResp.success}, msg={execResp.message}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[InputTerminal] execute service 调用失败: {ex.Message}");
+                    OnStatusChanged?.Invoke("failed");
+                }
             }
             PlanReady = false;
             IsPlanning = false;
@@ -160,29 +191,6 @@ namespace FPT.Business
         // ROS 回调（内部）
         // ═══════════════════════════════════════════
 
-        private void OnFkResult(DevicePose pose)
-        {
-            if (!_jointDirty) return;  // 不是等 FK，忽略
-            _jointDirty = false;
-            IsPlanning = false;
-
-            EndEffectorPose = pose;
-            NotifyEePoseChanged();  // 更新 UI EE 字段（不触发 IK）
-            Debug.Log($"[InputTerminal] FK 结果: {pose}");
-        }
-
-        private void OnIkResult(double[] angles)
-        {
-            if (!_poseDirty) return;  // 不是等 IK，忽略
-            _poseDirty = false;
-            IsPlanning = false;
-            PlanReady = true;
-
-            JointAngles = angles;
-            NotifyJointAnglesChanged();  // GhostArm 更新（不触发 FK）
-            Debug.Log($"[InputTerminal] IK 结果: [{string.Join(", ", angles)}]");
-        }
-
         private void OnPlanStatus(string status)
         {
             switch (status)
@@ -192,7 +200,6 @@ namespace FPT.Business
                     break;
                 case "success":
                     IsPlanning = false;
-                    // PlanReady 在 OnIkResult 中设置
                     break;
                 case "failed":
                     IsPlanning = false;
@@ -207,7 +214,7 @@ namespace FPT.Business
         }
 
         // ═══════════════════════════════════════════
-        // 去抖 + 通知
+        // 去抖 + Service 调用
         // ═══════════════════════════════════════════
 
         private async void RequestFkDebounced()
@@ -220,10 +227,26 @@ namespace FPT.Business
                 await Task.Delay((int)DebounceMs, token);
                 if (!token.IsCancellationRequested)
                 {
-                    _ros2.PublishFkRequest(JointAngles, ReferenceFrame);
+                    IsPlanning = true;
+                    var jointMsg = JointTrajectoryMapper.CreateJointState(JointAngles, ReferenceFrame);
+                    var jointReq = new JointPlanRequest(jointMsg);
+                    var result = await _node.CallServiceAsync<JointPlanResponse>("joint_plan", jointReq);
+
+                    if (!_jointDirty) return;
+                    _jointDirty = false;
+                    IsPlanning = false;
+
+                    EndEffectorPose = JointTrajectoryMapper.ToDevicePose(result.response);
+                    NotifyEePoseChanged();
+                    Debug.Log($"[InputTerminal] FK 结果: {EndEffectorPose}");
                 }
             }
             catch (TaskCanceledException) { /* 被新的去抖取消，正常 */ }
+            catch (Exception ex)
+            {
+                IsPlanning = false;
+                Debug.LogError($"[InputTerminal] FK service 调用失败: {ex.Message}");
+            }
         }
 
         private async void RequestIkDebounced()
@@ -236,21 +259,36 @@ namespace FPT.Business
                 await Task.Delay((int)DebounceMs, token);
                 if (!token.IsCancellationRequested)
                 {
-                    _ros2.PublishIkRequest(EndEffectorPose, ReferenceFrame);
+                    IsPlanning = true;
+                    var poseMsg = JointTrajectoryMapper.CreatePoseStamped(EndEffectorPose, ReferenceFrame);
+                    var eeReq = new EEPlanRequest(poseMsg);
+                    var result = await _node.CallServiceAsync<EEPlanResponse>("ee_plan", eeReq);
+
+                    if (!_poseDirty) return;
+                    _poseDirty = false;
+                    IsPlanning = false;
+                    PlanReady = true;
+
+                    JointAngles = JointTrajectoryMapper.ToJointAnglesDeg(result.response);
+                    NotifyJointAnglesChanged();
+                    Debug.Log($"[InputTerminal] IK 结果: [{string.Join(", ", JointAngles)}]");
                 }
             }
             catch (TaskCanceledException) { /* 被新的去抖取消，正常 */ }
+            catch (Exception ex)
+            {
+                IsPlanning = false;
+                Debug.LogError($"[InputTerminal] IK service 调用失败: {ex.Message}");
+            }
         }
 
         private void NotifyJointAnglesChanged()
         {
-            // GHOSTARM SUBSCRIBES HERE — fires only once per change
             OnJointAnglesChanged?.Invoke(JointAngles);
         }
 
         private void NotifyEePoseChanged()
         {
-            // 末端位姿显示订阅（不回触发 IK）
             OnEePoseChanged?.Invoke(EndEffectorPose);
         }
 
@@ -265,19 +303,12 @@ namespace FPT.Business
             IsPlanning = false;
             ActiveMode = ControlMode.JointSpace;
             NotifyJointAnglesChanged();
-            // 不请求 FK — 让用户主动拖动滑块时再触发
         }
 
         public void Dispose()
         {
             _debounceCts?.Cancel();
             _debounceCts?.Dispose();
-            if (_ros2 != null)
-            {
-                _ros2.OnFkResult -= OnFkResult;
-                _ros2.OnIkResult -= OnIkResult;
-                _ros2.OnPlanStatus -= OnPlanStatus;
-            }
         }
     }
 }

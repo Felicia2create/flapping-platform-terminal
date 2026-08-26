@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using FPT.Communication;
+using FPT.Business;
+using FPT.Core;
 using UnityEngine;
 
 namespace FPT.Visualization
@@ -38,16 +39,16 @@ namespace FPT.Visualization
         {
             DiscoverJoints();
 
-            // 自动绑定 Ros2Bridge（等待 AppContext 就绪）
+            // 监听 ArmDriver 的实时状态（共享 /joint_states 数据，不重复订阅）
             var ctx = FPT.Business.AppContext.Instance;
-            if (ctx != null && ctx.Ros2Bridge != null)
+            if (ctx != null && ctx.ArmDriver != null)
             {
-                Bind(ctx.Ros2Bridge);
-                Debug.Log($"[PlatformJointController] 已绑定 Ros2Bridge，{_joints.Count} 个关节就绪");
+                Bind(ctx.ArmDriver);
+                Debug.Log($"[PlatformJointController] 已绑定 ArmDriver，{_joints.Count} 个关节就绪");
             }
             else
             {
-                Debug.LogWarning("[PlatformJointController] AppContext 或 Ros2Bridge 未就绪");
+                Debug.LogWarning("[PlatformJointController] AppContext 或 ArmDriver 未就绪");
             }
         }
 
@@ -223,14 +224,27 @@ namespace FPT.Visualization
         }
 
         /// <summary>
-        /// 绑定 Ros2Bridge — 自动订阅 /joint_states 并驱动 7 关节
+        /// 绑定 ArmDriver — 监听状态变化并驱动 7 关节（共享 /joint_states 数据，不重复订阅）
         /// </summary>
-        public void Bind(FPT.Communication.Ros2Bridge ros2)
+        public void Bind(RobotArmDriver armDriver)
         {
-            ros2.SubscribeJointStates((names, angles, vels, torques) =>
+            armDriver.OnStateChanged += OnArmStateChanged;
+        }
+
+        private void OnArmStateChanged(IDeviceState state)
+        {
+            if (state is not RobotArmState arm) return;
+            if (arm.JointNames == null || arm.JointAngles == null) return;
+            UpdateFromRosJointStates(arm.JointNames, arm.JointAngles);
+        }
+
+        private void OnDestroy()
+        {
+            var ctx = FPT.Business.AppContext.Instance;
+            if (ctx != null && ctx.ArmDriver != null)
             {
-                UpdateFromRosJointStates(names, angles);
-            });
+                ctx.ArmDriver.OnStateChanged -= OnArmStateChanged;
+            }
         }
 
 #if UNITY_EDITOR

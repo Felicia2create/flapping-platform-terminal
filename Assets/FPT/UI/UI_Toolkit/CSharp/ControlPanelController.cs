@@ -90,7 +90,11 @@ namespace FPT.UI
             BindEeField(_eeRoll); BindEeField(_eePitch); BindEeField(_eeYaw);
 
             if (_frameSelector != null)
+            {
+                // 同步默认参考系
+                _frameSelector.value = _terminal.ReferenceFrame;
                 _frameSelector.RegisterValueChangedCallback(evt => _terminal.SetReferenceFrame(evt.newValue));
+            }
 
             // ── 操作按钮 ──
             _confirmBtn = root.Q<Button>("ConfirmButton");

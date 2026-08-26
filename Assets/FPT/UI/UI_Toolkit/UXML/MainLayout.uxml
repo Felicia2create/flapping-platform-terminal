@@ -118,7 +118,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="ee-input-row">
                     <ui:Label text="参考系:" class="ee-label" style="width: 40px; -unity-font-style: bold; color: rgb(30, 120, 230);" />
-                    <ui:DropdownField name="FrameSelector" choices="world,platform_base_link,platform_plate_Link,base_link,link1,link2,link3,link4,link5,link6" index="0" class="frame-selector" style="height: auto; width: 185px;" />
+                    <ui:DropdownField name="FrameSelector" choices="world,platform_base_link,platform_plate_Link,base_link,link1,link2,link3,link4,link5,link6" index="3" class="frame-selector" style="height: auto; width: 185px;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section" style="height: 345px;">
                     <ui:Label text="关节控制" class="section-title" />

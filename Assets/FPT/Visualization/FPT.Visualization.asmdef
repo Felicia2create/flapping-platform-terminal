@@ -4,7 +4,9 @@
     "references": [
         "FPT.Core",
         "FPT.Business",
-        "FPT.Communication"
+        "FPT.Communication",
+        "siemens.ros-sharp.Runtime",
+        "RosMessages.FptInterface"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FPT.Core;
-using FPT.Communication;
 
 namespace FPT.Business
 {
@@ -13,7 +12,6 @@ namespace FPT.Business
     /// </summary>
     public class DeviceManager
     {
-        private readonly CommunicationManager _commManager;
         private readonly Dictionary<string, IDeviceDriver> _drivers
             = new Dictionary<string, IDeviceDriver>();
 
@@ -30,10 +28,8 @@ namespace FPT.Business
         /// </summary>
         public event Action<IDeviceState> OnAnyDeviceStateChanged;
 
-        public DeviceManager(CommunicationManager commManager)
+        public DeviceManager()
         {
-            _commManager = commManager
-                ?? throw new ArgumentNullException(nameof(commManager));
         }
 
         /// <summary>
@@ -65,14 +61,10 @@ namespace FPT.Business
         /// </summary>
         public async Task InitializeDriverAsync(IDeviceDriver driver)
         {
-            // 1. 打开通信通道
-            var channelConfig = GetDefaultConfigForDevice(driver.DeviceId);
-            var channel = await _commManager.OpenChannel(channelConfig);
+            // 初始化驱动（ROS2 设备通过 Ros2Node 通信，不需要 channel）
+            await driver.InitializeAsync(null);
 
-            // 2. 初始化驱动（订阅消息等）
-            await driver.InitializeAsync(channel);
-
-            // 3. 绑定状态变更事件
+            // 绑定状态变更事件
             driver.OnStateChanged += state =>
             {
                 OnAnyDeviceStateChanged?.Invoke(state);
@@ -91,7 +83,6 @@ namespace FPT.Business
             {
                 await driver.ShutdownAsync();
             }
-            await _commManager.CloseAllChannels();
         }
 
         /// <summary>
@@ -119,37 +110,5 @@ namespace FPT.Business
         /// </summary>
         public Dictionary<string, IDeviceState> AllStates
             => _drivers.ToDictionary(kv => kv.Key, kv => kv.Value.CurrentState);
-
-        /// <summary>
-        /// 根据设备 ID 获取默认连接配置
-        /// 扩展点：新增设备 = 在此添加配置
-        /// </summary>
-        private ConnectionConfig GetDefaultConfigForDevice(string deviceId)
-        {
-            return deviceId switch
-            {
-                "sensors" => new ConnectionConfig
-                {
-                    DeviceId = "sensors",
-                    Type = TransportType.Serial,
-                    PortName = "COM3",
-                    BaudRate = 115200,
-                },
-                "vfd_motor" => new ConnectionConfig
-                {
-                    DeviceId = "vfd_motor",
-                    Type = TransportType.Serial,
-                    PortName = "COM4",
-                    BaudRate = 9600,
-                },
-                _ => new ConnectionConfig
-                {
-                    DeviceId = deviceId,
-                    Type = TransportType.Serial,
-                    PortName = "COM3",
-                    BaudRate = 115200,
-                },
-            };
-        }
     }
 }

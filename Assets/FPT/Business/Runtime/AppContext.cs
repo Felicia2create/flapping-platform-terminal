@@ -8,15 +8,11 @@ namespace FPT.Business
     {
         public static AppContext Instance { get; private set; }
 
-        [Header("ROS2")]
-        [SerializeField] private string _ros2Host = "127.0.0.1";
-        [SerializeField] private int _ros2Port = 10000;
-        [SerializeField] private bool _autoConnect = false;
+        [Header("ROS2 节点")]
+        [SerializeField] private Ros2NodeConfig _ros2NodeConfig;
 
-        public Ros2Bridge Ros2Bridge { get; private set; }
-        public Ros2PlanningBridge PlanningBridge { get; private set; }
+        public Ros2Node Ros2Node { get; private set; }
         public InputTerminal InputTerminal { get; private set; }
-        public CommunicationManager CommManager { get; private set; }
         public DeviceManager DeviceManager { get; private set; }
         public DeviceCoordinator Coordinator { get; private set; }
         public RobotArmDriver ArmDriver { get; private set; }
@@ -34,26 +30,28 @@ namespace FPT.Business
         {
             Debug.Log("[AppContext] 初始化...");
 
-            // ROS2 桥接
-            Ros2Bridge = new Ros2Bridge();
-            PlanningBridge = new Ros2PlanningBridge(Ros2Bridge);
-            InputTerminal = new InputTerminal(PlanningBridge);
+            // ROS2 节点（如果场景中没有 Ros2Node，自动创建）
+            Ros2Node = Ros2Node.Instance;
+            if (Ros2Node == null)
+            {
+                var nodeGo = new GameObject("Ros2Node");
+                // 不设置父物体，让 Ros2Node 成为根 GameObject（DontDestroyOnLoad 要求）
+                Ros2Node = nodeGo.AddComponent<Ros2Node>();
+                // Ros2Node 会在 Awake 中自动初始化
+            }
 
-            // 非ROS2设备管理器（传感器/变频器走串口）
-            CommManager = new CommunicationManager();
-            DeviceManager = new DeviceManager(CommManager);
+            // 数据同步中枢
+            InputTerminal = new InputTerminal(Ros2Node);
+
+            // 设备管理器
+            DeviceManager = new DeviceManager();
             DeviceManager.OnAnyDeviceStateChanged += s =>
                 Debug.Log($"[AppContext] {s.DeviceId} → {s.Connection}");
 
-            // 机械臂驱动 — 通过 Ros2Bridge 通信
+            // 机械臂驱动 — 通过 Ros2Node 通信
             ArmDriver = new RobotArmDriver("robot_arm");
-            ArmDriver.Bind(Ros2Bridge);
+            ArmDriver.Bind(Ros2Node);
             DeviceManager.RegisterDriver(ArmDriver);
-
-            // 预留
-            DeviceManager.RegisterDriver(new SensorDriver("sensors"));
-            DeviceManager.RegisterDriver(new VfdMotorDriver("vfd_motor"));
-            DeviceManager.RegisterDriver(new TurntableDriver("turntable"));
 
             Coordinator = new DeviceCoordinator(DeviceManager);
             Coordinator.Subscribe();
@@ -62,14 +60,6 @@ namespace FPT.Business
 
             // 动画演示控制器（由用户手动挂载，此处仅获取引用）
             AnimationDemo = GetComponent<AnimationDemoController>();
-
-            if (_autoConnect) ConnectRos2();
-        }
-
-        public void ConnectRos2()
-        {
-            Ros2Bridge.Connect(_ros2Host, _ros2Port);
-            Debug.Log($"[AppContext] ROS2 连接 {_ros2Host}:{_ros2Port}");
         }
 
         private void OnDestroy()

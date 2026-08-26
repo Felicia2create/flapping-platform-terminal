@@ -39,7 +39,7 @@ namespace FPT.Business
 
         public virtual async Task InitializeAsync(IDeviceChannel channel)
         {
-            Channel = channel ?? throw new ArgumentNullException(nameof(channel));
+            Channel = channel; // ROS2 设备通过 Ros2Node 通信，channel 可为 null
             ConfigurePipeline(Pipeline);
 
             StateMachine.TryTransitionTo(DeviceConnectionState.Connecting);

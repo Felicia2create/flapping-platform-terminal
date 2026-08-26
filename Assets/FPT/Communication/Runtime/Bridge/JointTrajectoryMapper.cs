@@ -1,14 +1,23 @@
-using RosMessageTypes.Sensor;
-using RosMessageTypes.Geometry;
-using RosMessageTypes.Std;
 using FPT.Core;
 using UnityEngine;
+
+// ROS# 消息类型（导入 RosSharp 包后生效）
+// ROS# 的消息类名不带 "Msg" 后缀，命名空间也不同
+using RosSharp.RosBridgeClient.MessageTypes.Sensor;
+using RosSharp.RosBridgeClient.MessageTypes.Geometry;
+using RosSharp.RosBridgeClient.MessageTypes.Std;
+
+// 避免与 UnityEngine 类型冲突
+using RosPose = RosSharp.RosBridgeClient.MessageTypes.Geometry.Pose;
+using RosQuaternion = RosSharp.RosBridgeClient.MessageTypes.Geometry.Quaternion;
+using RosVector3 = RosSharp.RosBridgeClient.MessageTypes.Geometry.Vector3;
 
 namespace FPT.Communication
 {
     /// <summary>
     /// ROS2 消息 ↔ FPT 领域类型 双向转换
     /// 统一管理 7 DOF 关节名、弧度↔度、四元数↔欧拉角
+    /// 使用 ROS# (ros-sharp) 消息类型
     /// </summary>
     public static class JointTrajectoryMapper
     {
@@ -23,70 +32,74 @@ namespace FPT.Communication
         public const int JointCount = 7;
 
         // ═══════════════════════════════════════════
-        // JointStateMsg → double[] (度)
+        // JointState → double[] (度)
         // ═══════════════════════════════════════════
 
         /// <summary>
-        /// JointStateMsg.position → 关节角度（度），按 JointNames 顺序重排
-        /// msg 中各关节可能出现顺序不同，此方法按名称对齐
+        /// JointState.position → 关节角度（度），按 JointNames 顺序重排
+        /// 如果消息中 name 为空，则按位置顺序直接映射（兼容 rosbridge 返回的无名 JointState）
         /// </summary>
-        public static double[] ToJointAnglesDeg(JointStateMsg msg)
+        public static double[] ToJointAnglesDeg(JointState msg)
         {
             var result = new double[JointCount];
+            int nameCount = msg.name != null ? msg.name.Length : 0;
+            int posCount = msg.position != null ? msg.position.Length : 0;
+            bool hasNames = nameCount > 0;
+
             for (int i = 0; i < JointCount; i++)
             {
-                var idx = System.Array.IndexOf(msg.name, JointNames[i]);
-                if (idx >= 0 && idx < msg.position.Length)
-                    result[i] = msg.position[idx] * Mathf.Rad2Deg;
+                if (hasNames)
+                {
+                    // 按名称查找
+                    var idx = System.Array.IndexOf(msg.name, JointNames[i]);
+                    if (idx >= 0 && idx < posCount)
+                        result[i] = msg.position[idx] * Mathf.Rad2Deg;
+                    else
+                        Debug.LogWarning($"[JointTrajectoryMapper] 关节 {JointNames[i]} 不在消息中");
+                }
                 else
-                    Debug.LogWarning($"[JointTrajectoryMapper] 关节 {JointNames[i]} 不在消息中");
+                {
+                    // 无名称时按位置顺序直接映射
+                    if (i < posCount)
+                        result[i] = msg.position[i] * Mathf.Rad2Deg;
+                    else
+                        Debug.LogWarning($"[JointTrajectoryMapper] position 长度不足，索引 {i} 无数据");
+                }
             }
             return result;
         }
 
-        /// <summary>
-        /// 直接从消息提取（不重排），返回 position 数组转为度
-        /// </summary>
-        public static double[] ToDegreesRaw(JointStateMsg msg)
-        {
-            var deg = new double[msg.position.Length];
-            for (int i = 0; i < deg.Length; i++)
-                deg[i] = msg.position[i] * Mathf.Rad2Deg;
-            return deg;
-        }
-
         // ═══════════════════════════════════════════
-        // double[] (度) → JointStateMsg
+        // double[] (度) → JointState
         // ═══════════════════════════════════════════
 
         /// <summary>
-        /// 创建 JointStateMsg（7 DOF，含转台），关节角输入为度，内部转弧度
-        /// frameId 通过 msg.header.frame_id 传递（FK 用）
+        /// 创建 JointState（7 DOF），关节角输入为度，内部转弧度
         /// </summary>
-        public static JointStateMsg CreateJointState(double[] anglesDeg, string frameId = "")
+        public static JointState CreateJointState(double[] anglesDeg, string frameId = "")
         {
             var rad = new double[JointCount];
             for (int i = 0; i < JointCount && i < anglesDeg.Length; i++)
                 rad[i] = anglesDeg[i] * Mathf.Deg2Rad;
 
-            return new JointStateMsg
+            return new JointState
             {
-                header = new HeaderMsg { frame_id = frameId },
+                header = new Header { frame_id = frameId },
                 name = JointNames,
                 position = rad,
-                velocity = System.Array.Empty<double>(),
-                effort = System.Array.Empty<double>(),
+                velocity = new double[0],
+                effort = new double[0],
             };
         }
 
         // ═══════════════════════════════════════════
-        // PoseStampedMsg → DevicePose
+        // PoseStamped → DevicePose
         // ═══════════════════════════════════════════
 
         /// <summary>
-        /// 从 PoseStampedMsg 提取 DevicePose（四元数 → 欧拉角）
+        /// 从 PoseStamped 提取 DevicePose（四元数 → 欧拉角）
         /// </summary>
-        public static DevicePose ToDevicePose(PoseStampedMsg msg)
+        public static DevicePose ToDevicePose(PoseStamped msg)
         {
             var p = msg.pose.position;
             var o = msg.pose.orientation;
@@ -95,9 +108,9 @@ namespace FPT.Communication
         }
 
         /// <summary>
-        /// 从 PoseMsg 提取 DevicePose
+        /// 从 Pose 提取 DevicePose
         /// </summary>
-        public static DevicePose ToDevicePose(PoseMsg msg)
+        public static DevicePose ToDevicePose(RosPose msg)
         {
             var o = msg.orientation;
             var euler = QuaternionToEuler(o.x, o.y, o.z, o.w);
@@ -106,23 +119,22 @@ namespace FPT.Communication
         }
 
         // ═══════════════════════════════════════════
-        // DevicePose → PoseStampedMsg
+        // DevicePose → PoseStamped
         // ═══════════════════════════════════════════
 
         /// <summary>
-        /// 创建 PoseStampedMsg（末端位姿），欧拉角 → 四元数
-        /// frameId 用于传递参考坐标系
+        /// 创建 PoseStamped（末端位姿），欧拉角 → 四元数
         /// </summary>
-        public static PoseStampedMsg CreatePoseStamped(DevicePose pose, string frameId = "base_link")
+        public static PoseStamped CreatePoseStamped(DevicePose pose, string frameId = "base_link")
         {
             var (x, y, z, w) = EulerToQuaternion(pose.Roll, pose.Pitch, pose.Yaw);
-            return new PoseStampedMsg
+            return new PoseStamped
             {
-                header = new HeaderMsg { frame_id = frameId },
-                pose = new PoseMsg
+                header = new Header { frame_id = frameId },
+                pose = new RosPose
                 {
-                    position = new PointMsg { x = pose.X, y = pose.Y, z = pose.Z },
-                    orientation = new QuaternionMsg { x = x, y = y, z = z, w = w },
+                    position = new Point { x = pose.X, y = pose.Y, z = pose.Z },
+                    orientation = new RosQuaternion { x = x, y = y, z = z, w = w },
                 },
             };
         }
@@ -131,15 +143,15 @@ namespace FPT.Communication
         // 四元数 ↔ 欧拉角
         // ═══════════════════════════════════════════
 
-        private static Vector3 QuaternionToEuler(double x, double y, double z, double w)
+        private static UnityEngine.Vector3 QuaternionToEuler(double x, double y, double z, double w)
         {
-            var q = new Quaternion((float)x, (float)y, (float)z, (float)w);
+            var q = new UnityEngine.Quaternion((float)x, (float)y, (float)z, (float)w);
             return q.eulerAngles;
         }
 
         private static (float x, float y, float z, float w) EulerToQuaternion(float roll, float pitch, float yaw)
         {
-            var q = Quaternion.Euler(roll, pitch, yaw);
+            var q = UnityEngine.Quaternion.Euler(roll, pitch, yaw);
             return (q.x, q.y, q.z, q.w);
         }
     }
