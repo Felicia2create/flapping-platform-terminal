@@ -2,85 +2,141 @@
     flex-direction: column;
 }
 
-.joint-sliders-scroll {
-    max-height: 220px;
-}
-
 .joint-slider-list {
     flex-direction: column;
     width: auto;
     flex-wrap: nowrap;
 }
 
-.action-button {
-    font-size: var(--font-size);
-    color: var(--color-text-light);
+/* ═══ 按钮体系：primary(青) / ghost(中性) / danger(红) ═══ */
+.primary-button {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent-dark);
     background-color: var(--color-accent);
-    border-width: 0;
-    border-radius: 7px;
+    border-width: 1px;
+    border-color: var(--color-accent-line);
+    border-radius: var(--radius);
     padding-top: 8px;
     padding-bottom: 8px;
-    padding-left: 14px;
-    padding-right: 14px;
-    margin-top: 6px;
-    margin-bottom: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
+    flex-grow: 1;
+    margin: 2px;
     -unity-font-style: bold;
 }
 
-.action-button:hover {
-    background-color: var(--color-accent2);
+.primary-button:hover {
+    background-color: rgb(64, 133, 220);
 }
 
-.action-button:active {
-    background-color: rgb(0, 140, 158);
+.primary-button:active {
+    background-color: var(--color-accent-dim);
+    color: rgb(255, 255, 255);
 }
 
-.button-row .action-button {
-    font-size: var(--font-size-sm);
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
-    flex-grow: 1;
-}
-
-.mode-button {
+.ghost-button {
     font-size: var(--font-size-sm);
     color: var(--color-text-dim);
-    background-color: rgba(230, 240, 252, 0.7);
+    background-color: transparent;
     border-width: 1px;
-    border-color: var(--color-border);
-    border-radius: 6px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
+    border-color: var(--color-line);
+    border-radius: var(--radius);
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
     flex-grow: 1;
     margin: 2px;
+    -unity-font-style: bold;
 }
 
-.mode-button:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
+.ghost-button:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent-dim);
+    background-color: var(--color-accent-ghost);
+}
+
+.danger-button {
+    font-size: var(--font-size-sm);
+    color: rgb(255, 233, 234);
+    background-color: var(--color-danger-deep);
+    border-width: 1px;
+    border-color: rgb(242, 109, 114);
+    border-radius: var(--radius);
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    flex-grow: 1;
+    margin: 2px;
+    -unity-font-style: bold;
+}
+
+.danger-button:hover {
+    background-color: rgb(194, 56, 61);
+}
+
+/* 兼容旧类名（逐步迁移期） */
+.confirm-button {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent-dark);
+    background-color: var(--color-accent);
+    border-width: 1px;
+    border-color: var(--color-accent-line);
+    border-radius: var(--radius);
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    flex-grow: 1;
+    margin: 2px;
+    -unity-font-style: bold;
+}
+
+.confirm-button:hover {
+    background-color: rgb(64, 133, 220);
+}
+
+.cancel-button {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    background-color: transparent;
+    border-width: 1px;
+    border-color: var(--color-line);
+    border-radius: var(--radius);
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    flex-grow: 1;
+    margin: 2px;
+    -unity-font-style: bold;
+}
+
+.cancel-button:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent-dim);
+    background-color: var(--color-accent-ghost);
 }
 
 .stop-button {
-    font-size: 19px;
-    color: var(--color-text-light);
-    background-color: var(--color-danger);
-    border-width: 0;
+    font-size: 15px;
+    color: rgb(255, 233, 234);
+    background-color: var(--color-danger-deep);
+    border-width: 1px;
+    border-color: rgb(242, 109, 114);
     border-radius: 9px;
-    padding: 12px;
-    margin-top: 10px;
+    padding: 11px;
+    margin-top: 8px;
     -unity-font-style: bold;
 }
 
 .stop-button:hover {
-    background-color: rgb(228, 70, 58);
+    background-color: rgb(194, 56, 61);
 }
 
 .stop-button:active {
-    background-color: rgb(170, 40, 35);
+    background-color: rgb(140, 32, 37);
 }
 
 .button-row {
@@ -88,6 +144,7 @@
     margin-top: 4px;
 }
 
+/* ═══ 末端位姿输入 ═══ */
 .ee-input-row {
     flex-direction: row;
     align-items: center;
@@ -106,218 +163,188 @@
     margin-right: 4px;
 }
 
-.slider-control {
-    margin: 4px 0;
-}
-
+/* ═══ 底部状态栏 ═══ */
 .status-bar {
     height: var(--statusbar-height);
     min-height: var(--statusbar-height);
-    background-color: rgba(224, 240, 255, 0.68);
+    background-color: var(--color-panel);
     flex-direction: row;
     align-items: center;
     padding-left: 12px;
     padding-right: 12px;
     border-width: 1px;
-    border-color: var(--color-border);
+    border-color: var(--color-line);
     border-radius: var(--radius);
-    margin-top: 10px;
+    margin-top: 8px;
+}
+
+.status-dot-inline {
+    width: 7px;
+    height: 7px;
+    border-radius: 4px;
+    margin-right: 7px;
+    background-color: var(--color-ok);
+}
+
+.status-ready {
+    font-size: 11px;
+    color: var(--color-ok);
+    -unity-font-style: bold;
+    margin-right: 14px;
 }
 
 .status-message {
-    font-size: var(--font-size-sm);
+    font-size: 11px;
     color: var(--color-text-dim);
-    -unity-font-style: bold;
     flex-grow: 1;
 }
 
+.status-endpoint {
+    font-size: 11px;
+    color: var(--color-text-faint);
+    margin-right: 14px;
+}
+
 .status-time {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-dim);
+    font-size: 11px;
+    color: var(--color-text-faint);
     -unity-font-style: bold;
 }
 
+/* ═══ 参考系 / 下拉 ═══ */
 .frame-selector {
     font-size: var(--font-size-sm);
     flex-grow: 1;
 }
 
 .mode-hint {
-    font-size: var(--font-size-sm);
+    font-size: 11px;
     color: var(--color-accent);
-    padding: 3px 6px;
+    padding: 4px 8px;
     margin: 2px 0;
-    border-radius: var(--radius);
-    background-color: rgba(216, 235, 255, 0.58);
+    border-radius: 5px;
+    background-color: var(--color-accent-ghost);
+    border-width: 1px;
+    border-color: var(--color-accent-line);
+    -unity-font-style: bold;
 }
 
 .plan-status {
-    font-size: var(--font-size-sm);
+    font-size: 11px;
     color: var(--color-text-dim);
-    padding: 2px 6px;
+    padding: 3px 8px;
     margin: 2px 0;
-    border-radius: var(--radius);
+    border-radius: 5px;
 }
 
 .plan-status.planning {
-    color: rgb(220, 180, 40);
-    background-color: rgba(220, 180, 40, 0.1);
+    color: var(--color-warning);
+    background-color: var(--color-warning-ghost);
+    border-width: 1px;
+    border-color: var(--color-warning-line);
 }
 
 .plan-status.failed {
     color: var(--color-danger);
-    background-color: rgba(200, 55, 50, 0.1);
-}
-
-.confirm-button {
-    font-size: var(--font-size-sm);
-    color: white;
-    background-color: rgba(0, 156, 206, 0.86);
-    border-width: 0;
-    border-radius: var(--radius);
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 12px;
-    padding-right: 12px;
-    flex-grow: 1;
-    margin: 2px;
-}
-
-.confirm-button:hover {
-    background-color: rgb(0, 140, 158);
-}
-
-.cancel-button {
-    font-size: var(--font-size-sm);
-    color: var(--color-text);
-    background-color: rgba(216, 235, 255, 0.62);
+    background-color: var(--color-danger-ghost);
     border-width: 1px;
-    border-color: var(--color-border);
-    border-radius: var(--radius);
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 12px;
-    padding-right: 12px;
-    flex-grow: 1;
-    margin: 2px;
+    border-color: var(--color-danger-line);
 }
 
-.cancel-button:hover {
-    background-color: var(--color-danger);
-    color: white;
-}
-
-.target-data {
-    color: var(--color-accent);
-}
-
-.left-panel-anim {
-    width: 200px;
-    background-color: var(--color-panel);
-    border-width: 1px;
-    border-color: var(--color-border);
-    border-radius: var(--radius);
-    padding: 14px 13px;
-    margin-right: 10px;
-    flex-direction: row;
-    overflow: hidden;
-}
-
-.left-panel-anim.collapsed {
-    width: 28px;
-    padding: 4px;
-}
-
-.right-panel-anim {
-    width: 300px;
-    background-color: var(--color-panel);
-    border-width: 1px;
-    border-color: var(--color-border);
-    border-radius: var(--radius);
-    padding: 14px 13px;
-    margin-left: 10px;
-    flex-direction: row;
-    overflow: hidden;
-}
-
-.right-panel-anim.collapsed {
-    width: 28px;
-    padding: 4px;
-}
-
-.panel-inner {
-    flex-grow: 1;
-    overflow: hidden;
-}
-
-.panel-collapse-btn {
-    width: 24px;
-    font-size: 14px;
-    color: var(--color-text-dim);
-    background-color: var(--color-surface);
-    border-width: 0;
-    border-radius: var(--radius);
-    padding: 4px 0;
-    -unity-text-align: middle-center;
-}
-
-.panel-collapse-btn:hover {
-    color: var(--color-accent);
-}
-
+/* ═══ 动画页面 ═══ */
 .center-view-anim {
     flex-grow: 1;
     background-color: transparent;
 }
 
-/* ── 动画播放控件 ── */
-
 .animation-status {
-    font-size: var(--font-size-sm);
-    padding: 4px 8px;
-    border-radius: var(--radius);
-    background-color: rgba(216, 235, 255, 0.62);
+    font-size: 11px;
+    padding: 4px 9px;
+    border-radius: 5px;
+    background-color: var(--color-raise);
+    border-width: 1px;
+    border-color: var(--color-line-soft);
     color: var(--color-text-dim);
     margin-bottom: 6px;
+    -unity-font-style: bold;
 }
+
 .animation-status.playing {
-    color: rgb(0, 126, 180);
+    color: var(--color-ok);
+    background-color: var(--color-ok-ghost);
+    border-color: var(--color-ok-line);
 }
+
 .animation-status.paused {
     color: var(--color-warning);
+    background-color: var(--color-warning-ghost);
+    border-color: var(--color-warning-line);
 }
 
 .play-button {
     font-size: var(--font-size-lg);
-    color: var(--color-text-light);
-    background-color: rgba(0, 156, 206, 0.88);
+    color: var(--color-accent-dark);
+    background-color: var(--color-accent);
     border-width: 1px;
-    border-color: rgba(184, 232, 255, 0.70);
+    border-color: var(--color-accent-line);
     border-radius: 9px;
-    padding: 12px;
-    margin-top: 10px;
+    padding: 11px;
+    margin-top: 8px;
     -unity-font-style: bold;
 }
+
 .play-button:hover {
-    background-color: rgba(25, 103, 206, 0.90);
+    background-color: rgb(64, 133, 220);
 }
 
 .speed-row {
     flex-direction: row;
     align-items: center;
 }
+
 .speed-slider {
     flex-grow: 1;
 }
 
+.speed-value {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
+    width: 52px;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+}
+
+/* 深色下拉（动画模式 / 数据分析通道等代码创建的下拉共用） */
+.fx-dropdown .unity-base-popup-field__input,
+.fx-dropdown .unity-base-field__input {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    background-color: var(--color-raise);
+    border-width: 1px;
+    border-color: var(--color-line);
+    border-radius: 6px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.fx-dropdown .unity-base-popup-field__input:hover,
+.fx-dropdown .unity-base-field__input:hover {
+    background-color: rgba(232, 245, 255, 0.86);
+    border-color: var(--color-accent);
+}
+
+/* 兼容旧类名 */
 .animation-mode-dropdown .unity-base-popup-field__input,
 .animation-mode-dropdown .unity-base-field__input {
-    font-size: var(--font-size);
-    color: rgb(16, 73, 150);
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
     -unity-font-style: bold;
-    background-color: rgba(216, 235, 255, 0.72);
+    background-color: var(--color-raise);
     border-width: 1px;
-    border-color: rgba(25, 103, 206, 0.62);
+    border-color: var(--color-line);
     border-radius: 6px;
     padding-top: 5px;
     padding-bottom: 5px;
@@ -328,44 +355,47 @@
 .animation-mode-dropdown .unity-base-popup-field__input:hover,
 .animation-mode-dropdown .unity-base-field__input:hover {
     background-color: rgba(232, 245, 255, 0.86);
-    border-color: rgb(12, 72, 156);
+    border-color: var(--color-accent);
 }
 
+/* ═══ 样机选择按钮 ═══ */
 .prototype-button-row {
     flex-direction: row;
 }
 
 .prototype-button {
     flex-grow: 1;
-    font-size: 12px;
-    color: rgb(16, 73, 150);
-    background-color: rgba(216, 235, 255, 0.62);
+    font-size: 11px;
+    color: var(--color-text-dim);
+    background-color: var(--color-raise);
     border-width: 1px;
-    border-color: rgba(25, 103, 206, 0.48);
+    border-color: var(--color-line);
     border-radius: 6px;
     padding-top: 6px;
     padding-bottom: 6px;
-    padding-left: 6px;
-    padding-right: 6px;
-    margin-left: 3px;
-    margin-right: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 2px;
+    margin-right: 2px;
     -unity-font-style: bold;
 }
 
 .prototype-button:hover {
-    background-color: rgba(232, 245, 255, 0.82);
+    color: var(--color-text);
+    border-color: var(--color-accent-dim);
 }
 
 .prototype-button.prototype-button-active {
-    color: var(--color-text-light);
-    background-color: rgba(25, 103, 206, 0.90);
-    border-color: rgba(184, 232, 255, 0.78);
+    color: var(--color-accent);
+    background-color: var(--color-accent-ghost);
+    border-color: var(--color-accent-line);
 }
 
+/* ═══ 特写卡片 ═══ */
 .closeup-card {
-    background-color: rgba(12, 42, 82, 0.18);
+    background-color: var(--color-raise);
     border-width: 1px;
-    border-color: rgba(184, 232, 255, 0.52);
+    border-color: var(--color-line);
     border-radius: 8px;
     padding-top: 7px;
     padding-bottom: 0;
@@ -379,22 +409,22 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 6px;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 9px;
+    padding-right: 9px;
 }
 
 .closeup-title {
     font-size: var(--font-size-sm);
-    color: rgb(18, 72, 150);
+    color: var(--color-text);
     -unity-font-style: bold;
 }
 
 .closeup-badge {
-    font-size: 11px;
-    color: white;
-    background-color: rgba(0, 156, 206, 0.86);
+    font-size: 10px;
+    color: var(--color-ok);
+    background-color: var(--color-ok-ghost);
     border-width: 1px;
-    border-color: rgba(184, 232, 255, 0.62);
+    border-color: var(--color-ok-line);
     border-radius: 999px;
     padding-top: 2px;
     padding-bottom: 2px;
@@ -409,58 +439,16 @@
     height: 220px;
     background-color: rgba(8, 24, 48, 0.24);
     border-width: 1px;
-    border-color: rgba(86, 155, 232, 0.34);
+    border-color: var(--color-line-soft);
     border-radius: 0;
     -unity-background-scale-mode: scale-and-crop;
 }
 
-.speed-value {
-    font-size: var(--font-size);
-    color: var(--color-accent);
-    width: 52px;
-    -unity-text-align: middle-center;
-}
-
-/* ── 路径选择（规范 §08 分段控件：选中段 = accent 填充白字） ── */
-.path-list {
-    flex-direction: column;
-}
-
-.path-button {
-    font-size: var(--font-size);
-    color: var(--color-text);
-    background-color: var(--color-surface);
-    border-width: 1px;
-    border-color: var(--color-border);
-    border-radius: 6px;
-    padding-top: 9px;
-    padding-bottom: 9px;
-    padding-left: 12px;
-    padding-right: 12px;
-    margin-top: 0;
-    margin-bottom: 6px;
-    margin-left: 0;
-    margin-right: 0;
-    -unity-text-align: middle-left;
-    -unity-font-style: bold;
-}
-
-.path-button:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
-}
-
-.path-button.path-active {
-    color: var(--color-text-light);
-    background-color: var(--color-accent);
-    border-color: var(--color-accent);
-}
-
-/* ── 飞行参数折线图卡片（X 轴=时间） ── */
+/* ═══ 折线图卡片 ═══ */
 .chart-card {
-    background-color: rgba(216, 235, 255, 0.50);
+    background-color: var(--color-raise);
     border-width: 1px;
-    border-color: rgba(86, 155, 232, 0.24);
+    border-color: var(--color-line-soft);
     border-radius: 6px;
     padding-top: 6px;
     padding-bottom: 6px;
@@ -478,12 +466,12 @@
 
 .chart-title {
     font-size: var(--font-size-sm);
-    color: rgba(75, 103, 142, 0.86);
+    color: var(--color-text-dim);
     -unity-font-style: bold;
 }
 
 .chart-value {
-    font-size: var(--font-size);
+    font-size: var(--font-size-sm);
     color: var(--color-accent);
     -unity-font-style: bold;
     -unity-text-align: middle-right;
@@ -491,4 +479,54 @@
 
 .chart-plot {
     height: 40px;
+}
+
+/* ═══ 数据分析页（大折线图，X 轴=时间） ═══ */
+.data-center {
+    flex-grow: 1;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.data-chart-card {
+    flex-grow: 1;
+    margin-bottom: 0;
+    background-color: var(--color-panel);
+    border-color: var(--color-line);
+    border-radius: var(--radius);
+    padding-top: 10px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.data-chart-body {
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.data-yaxis {
+    width: 56px;
+    justify-content: space-between;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.data-chart-plot {
+    flex-grow: 1;
+}
+
+.data-xaxis {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 56px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.data-axis-label {
+    font-size: 10px;
+    color: var(--color-text-faint);
 }

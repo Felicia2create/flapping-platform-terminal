@@ -4,6 +4,7 @@
     "references": [
         "FPT.Core",
         "FPT.Business",
+        "FPT.Communication",
         "FPT.Visualization"
     ],
     "includePlatforms": [],

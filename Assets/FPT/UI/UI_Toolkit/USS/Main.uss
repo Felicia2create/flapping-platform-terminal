@@ -1,32 +1,67 @@
+/* ═══════════════════════════════════════════════════════
+   FPT 终端 · 设计令牌
+   半透明浅蓝（初版配色）：清透面板 + 主蓝 accent + 青 accent2
+   ═══════════════════════════════════════════════════════ */
 :root {
-    --color-bg: rgb(226, 239, 255);
-    --color-panel: rgba(224, 240, 255, 0.68);
-    --color-surface: rgba(216, 235, 255, 0.62);
-    --color-border: rgba(90, 156, 232, 0.46);
-    --color-accent: rgb(25, 103, 206);
-    --color-accent2: rgb(0, 156, 206);
-    --color-warning: rgb(230, 150, 20);
-    --color-danger: rgb(220, 60, 50);
-    --color-text: rgb(18, 44, 82);
-    --color-text-dim: rgb(75, 103, 142);
-    --color-text-light: rgb(255, 255, 255);
-    --font-size-sm: 13px;
-    --font-size: 15px;
-    --font-size-lg: 18px;
-    --radius: 8px;
-    --panel-width: 300px;
-    --panel-width-compact: 264px;
-    --topbar-height: 56px;
+    /* ── 层次（半透明，透出 3D 场景） ── */
+    --color-ink: rgb(226, 239, 255);            /* 地（仅参考，root 不刷） */
+    --color-panel: rgba(224, 240, 255, 0.68);   /* 面板 */
+    --color-raise: rgba(216, 235, 255, 0.55);   /* 抬升面（数据行/芯片/卡片） */
+    --color-line: rgba(90, 156, 232, 0.46);     /* 边线 */
+    --color-line-soft: rgba(86, 155, 232, 0.22);/* 弱边线 */
+    --color-popup: rgba(226, 239, 255, 0.97);   /* 弹出层（近不透明） */
+
+    /* ── 信号色 ── */
+    --color-accent: rgb(25, 103, 206);          /* 主蓝 */
+    --color-accent-dim: rgb(0, 156, 206);       /* 青（辅助/hover） */
+    --color-accent-ghost: rgba(25, 103, 206, 0.08);
+    --color-accent-line: rgba(25, 103, 206, 0.42);
+    --color-accent-dark: rgb(255, 255, 255);    /* accent 底上的文字 */
+
+    /* ── 语义色 ── */
+    --color-ok: rgb(0, 156, 206);               /* 在线/就绪（青） */
+    --color-ok-ghost: rgba(0, 156, 206, 0.12);
+    --color-ok-line: rgba(0, 156, 206, 0.42);
+    --color-warning: rgb(230, 150, 20);         /* 警告/规划中 */
+    --color-warning-ghost: rgba(230, 150, 20, 0.10);
+    --color-warning-line: rgba(230, 150, 20, 0.40);
+    --color-danger: rgb(220, 60, 50);           /* 危险/急停 */
+    --color-danger-deep: rgb(190, 48, 42);
+    --color-danger-ghost: rgba(220, 60, 50, 0.12);
+    --color-danger-line: rgba(220, 60, 50, 0.35);
+
+    /* ── 文字 ── */
+    --color-text: rgb(18, 44, 82);              /* 正文（深海军蓝） */
+    --color-text-strong: rgb(15, 60, 130);      /* 标题 */
+    --color-text-dim: rgb(75, 103, 142);        /* 弱 */
+    --color-text-faint: rgba(75, 103, 142, 0.75);/* 微弱 */
+
+    /* ── 字号 / 几何 ── */
+    --font-size-sm: 12px;
+    --font-size: 14px;
+    --font-size-lg: 17px;
+    --radius: 7px;
+    --panel-width: 264px;
+    --panel-width-right: 284px;
+    --topbar-height: 52px;
     --statusbar-height: 30px;
-    --layout-gap: 10px;
 }
 
 .root {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    background-color: transparent;
-    padding: 10px;
+    padding: 8px;
+}
+
+/* 由 MainViewController 挂到 UIDocument 根元素。
+   注意：不设背景色——中央 3D 视口靠相机清屏色（#0A141F）透出，
+   在根元素上刷背景会把 3D 场景遮住。 */
+.app-root {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
 }
 
 .main-area {
@@ -35,25 +70,26 @@
     overflow: hidden;
 }
 
+/* ── 侧栏面板（深色实色 + 发丝线） ── */
 .left-panel {
     width: var(--panel-width);
     background-color: var(--color-panel);
     border-width: 1px;
-    border-color: var(--color-border);
+    border-color: var(--color-line);
     border-radius: var(--radius);
-    padding: 14px 13px;
-    margin-right: 10px;
+    padding: 12px 11px;
+    margin-right: 8px;
     overflow: scroll;
 }
 
 .right-panel {
-    width: var(--panel-width);
+    width: var(--panel-width-right);
     background-color: var(--color-panel);
     border-width: 1px;
-    border-color: var(--color-border);
+    border-color: var(--color-line);
     border-radius: var(--radius);
-    padding: 14px 13px;
-    margin-left: 10px;
+    padding: 12px 11px;
+    margin-left: 8px;
     overflow: scroll;
 }
 
@@ -62,33 +98,34 @@
     background-color: transparent;
 }
 
+/* ── 面板头：青色左边条 + 底部发丝线 ── */
 .panel-header {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 9px;
     padding-left: 8px;
-    border-left-width: 4px;
+    border-left-width: 3px;
     border-left-color: var(--color-accent);
     border-bottom-width: 1px;
-    border-bottom-color: rgba(25, 103, 206, 0.22);
+    border-bottom-color: var(--color-line-soft);
 }
 
 .panel-header-title {
-    font-size: 20px;
-    color: var(--color-accent);
+    font-size: 16px;
+    color: var(--color-text-strong);
     -unity-font-style: bold;
 }
 
 .panel-header-sub {
-    font-size: var(--font-size-sm);
-    color: rgba(75, 103, 142, 0.78);
+    font-size: 10px;
+    color: var(--color-text-faint);
     -unity-font-style: bold;
 }
 
 .data-section {
-    margin-top: 16px;
+    margin-top: 14px;
     margin-bottom: 4px;
 }
 
@@ -97,89 +134,88 @@
     margin-bottom: 4px;
 }
 
+/* ── 分组微标签：青色小字 ── */
 .section-title {
-    font-size: var(--font-size);
-    color: var(--color-accent2);
+    font-size: 11px;
+    color: var(--color-accent-dim);
     -unity-font-style: bold;
-    margin-bottom: 8px;
+    margin-bottom: 7px;
 }
 
-/* === 数据行（规范 §08 .data-row：标签左 / 数值右，独立圆角框） === */
+/* ── 数据行：抬升面 + 弱发丝线 ── */
 .data-row {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background-color: rgba(216, 235, 255, 0.48);
+    background-color: var(--color-raise);
     border-width: 1px;
-    border-color: rgba(86, 155, 232, 0.22);
+    border-color: var(--color-line-soft);
     border-radius: 6px;
-    padding-top: 7px;
-    padding-bottom: 7px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     padding-left: 10px;
     padding-right: 10px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .data-row-label {
-    font-size: var(--font-size);
+    font-size: var(--font-size-sm);
     color: var(--color-text-dim);
     -unity-font-style: bold;
 }
 
 .data-row-value {
-    font-size: var(--font-size);
+    font-size: var(--font-size-sm);
     color: var(--color-accent);
     -unity-font-style: bold;
     -unity-text-align: middle-right;
 }
 
-/* 位置 / 姿态 等子分组小标题 */
 .data-subtitle {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-dim);
+    font-size: 11px;
+    color: var(--color-text-faint);
     -unity-font-style: bold;
     margin-top: 4px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .placeholder-text {
-    font-size: var(--font-size);
-    color: var(--color-text-dim);
-    -unity-font-style: bold;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-faint);
 }
 
-/* === 位姿芯片（规范 §08 .chip：3 列网格，键名上 / 数值下） === */
+/* ── 位姿芯片：3 列网格 ── */
 .chip-row {
     flex-direction: row;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .chip {
     flex-grow: 1;
     flex-basis: 0;
-    background-color: rgba(216, 235, 255, 0.52);
+    background-color: var(--color-raise);
     border-width: 1px;
-    border-color: rgba(86, 155, 232, 0.24);
+    border-color: var(--color-line-soft);
     border-radius: 6px;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     padding-left: 8px;
     padding-right: 8px;
-    margin-left: 3px;
-    margin-right: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 .chip-label {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-dim);
+    font-size: 10px;
+    color: var(--color-text-faint);
     -unity-font-style: bold;
 }
 
 .chip-value {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size);
     color: var(--color-accent);
     -unity-font-style: bold;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 .page-container {

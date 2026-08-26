@@ -1,15 +1,16 @@
+/* ═══ 顶栏：深色实色 + 发丝底线 ═══ */
 .top-bar {
     height: var(--topbar-height);
     min-height: var(--topbar-height);
-    background-color: rgba(224, 240, 255, 0.70);
+    background-color: var(--color-panel);
     flex-direction: row;
     align-items: center;
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 12px;
+    padding-right: 12px;
     border-width: 1px;
-    border-color: var(--color-border);
+    border-color: var(--color-line);
     border-radius: var(--radius);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .top-bar-left {
@@ -32,81 +33,67 @@
 }
 
 .top-bar-title {
-    font-size: 19px;
-    color: var(--color-accent);
+    font-size: 15px;
+    color: var(--color-text-strong);
     -unity-font-style: bold;
-    margin-right: 12px;
+    margin-right: 10px;
 }
 
 .top-bar-device {
-    font-size: 22px;
-    color: rgb(20, 90, 190);
+    font-size: 11px;
+    color: var(--color-text-faint);
     -unity-font-style: bold;
     -unity-text-align: middle-center;
 }
 
 .top-bar-status {
-    font-size: var(--font-size-sm);
+    font-size: 11px;
     color: var(--color-text-dim);
     -unity-font-style: bold;
-}
-
-.top-bar-mode {
-    font-size: var(--font-size-sm);
-    color: var(--color-accent2);
-    -unity-font-style: bold;
-    background-color: rgba(0, 168, 190, 0.1);
-    border-width: 1px;
-    border-color: rgba(0, 168, 190, 0.4);
-    border-radius: 6px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    padding-left: 8px;
-    padding-right: 8px;
-    margin-right: 16px;
 }
 
 .top-bar-fps {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-dim);
+    font-size: 11px;
+    color: var(--color-text-faint);
     -unity-font-style: bold;
 }
 
+/* ── 连接状态胶囊 ── */
 .status-pill {
     flex-direction: row;
     align-items: center;
-    background-color: rgba(216, 235, 255, 0.48);
+    background-color: var(--color-raise);
     border-width: 1px;
-    border-color: rgba(100, 116, 139, 0.35);
+    border-color: var(--color-line);
     border-radius: 999px;
     padding-top: 3px;
     padding-bottom: 3px;
     padding-left: 10px;
     padding-right: 10px;
-    margin-left: 10px;
+    margin-left: 8px;
 }
 
 .status-pill.connected {
-    background-color: rgba(0, 156, 206, 0.14);
-    border-color: rgba(0, 156, 206, 0.42);
+    background-color: var(--color-ok-ghost);
+    border-color: var(--color-ok-line);
 }
 
 .status-pill.error,
 .status-pill.disconnected {
-    background-color: rgba(220, 60, 50, 0.12);
-    border-color: rgba(220, 60, 50, 0.35);
+    background-color: var(--color-danger-ghost);
+    border-color: var(--color-danger-line);
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 4px;
     margin-right: 6px;
-    background-color: var(--color-text-dim);
+    background-color: var(--color-text-faint);
 }
 
 .status-dot.connected {
-    background-color: var(--color-accent2);
+    background-color: var(--color-ok);
 }
 
 .status-dot.error,
@@ -114,80 +101,137 @@
     background-color: var(--color-danger);
 }
 
+/* ── 分段导航（segmented control）── */
+.nav-segment {
+    flex-direction: row;
+    background-color: var(--color-raise);
+    border-width: 1px;
+    border-color: var(--color-line);
+    border-radius: var(--radius);
+    padding: 2px;
+}
+
 .nav-button {
-    font-size: var(--font-size);
+    font-size: var(--font-size-sm);
     color: var(--color-text-dim);
     background-color: transparent;
     border-width: 0;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 18px;
-    padding-right: 18px;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 4px;
-    margin-right: 4px;
-    border-radius: var(--radius);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 14px;
+    padding-right: 14px;
+    margin: 0;
+    border-radius: 5px;
     -unity-font-style: bold;
 }
 
 .nav-button:hover {
-    color: var(--color-accent);
-    background-color: rgba(216, 235, 255, 0.52);
+    color: var(--color-text);
+    background-color: var(--color-accent-ghost);
 }
 
 .nav-button.nav-active {
-    color: white;
-    background-color: rgba(25, 103, 206, 0.86);
+    color: var(--color-accent);
+    background-color: var(--color-accent-ghost);
     border-width: 1px;
-    border-color: rgba(174, 215, 255, 0.70);
+    border-color: var(--color-accent-line);
 }
 
-/* === 顶栏 Logo 徽标 === */
+/* ── 顶栏 Logo 徽标 ── */
 .app-logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 7px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     border-width: 1px;
-    border-color: var(--color-accent);
-    background-color: rgba(216, 235, 255, 0.56);
+    border-color: var(--color-accent-dim);
+    background-color: var(--color-accent-ghost);
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
+    margin-right: 9px;
 }
 
 .app-logo-text {
-    font-size: 17px;
+    font-size: 14px;
     color: var(--color-accent);
     -unity-font-style: bold;
 }
 
-/* === 模式徽标 IDLE（规范 §08 .badge：accent2 圆点 + 文字） === */
+/* ── 模式徽标（三态：idle=青 / planning=琥珀 / estop=红）── */
 .badge {
     flex-direction: row;
     align-items: center;
-    background-color: rgba(0, 156, 206, 0.14);
+    background-color: var(--color-ok-ghost);
     border-width: 1px;
-    border-color: rgba(0, 156, 206, 0.42);
+    border-color: var(--color-ok-line);
     border-radius: 6px;
     padding-top: 3px;
     padding-bottom: 3px;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
+    padding-left: 9px;
+    padding-right: 9px;
+    margin-left: 9px;
+    margin-right: 9px;
 }
 
 .badge-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 999px;
-    background-color: var(--color-accent2);
-    margin-right: 6px;
+    background-color: var(--color-ok);
+    margin-right: 5px;
 }
 
 .badge-text {
-    font-size: var(--font-size-sm);
-    color: var(--color-accent2);
+    font-size: 11px;
+    color: var(--color-ok);
     -unity-font-style: bold;
+}
+
+.badge.badge-planning {
+    background-color: var(--color-warning-ghost);
+    border-color: var(--color-warning-line);
+}
+
+.badge.badge-planning .badge-dot {
+    background-color: var(--color-warning);
+}
+
+.badge.badge-planning .badge-text {
+    color: var(--color-warning);
+}
+
+.badge.badge-estop {
+    background-color: var(--color-danger-ghost);
+    border-color: var(--color-danger-line);
+}
+
+.badge.badge-estop .badge-dot {
+    background-color: var(--color-danger);
+}
+
+.badge.badge-estop .badge-text {
+    color: var(--color-danger);
+}
+
+/* ── 常驻急停（顶栏右侧，全程可见）── */
+.estop-button {
+    font-size: 13px;
+    color: rgb(255, 233, 234);
+    background-color: var(--color-danger-deep);
+    border-width: 1px;
+    border-color: rgb(242, 109, 114);
+    border-radius: 8px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-left: 10px;
+    -unity-font-style: bold;
+}
+
+.estop-button:hover {
+    background-color: rgb(194, 56, 61);
+}
+
+.estop-button:active {
+    background-color: rgb(140, 32, 37);
 }

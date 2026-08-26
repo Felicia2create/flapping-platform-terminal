@@ -92,7 +92,7 @@ namespace FPT.UI
             {
                 _modeSelector = new DropdownField(_modeOptions, GetModeIndex(demo.CurrentMode));
                 _modeSelector.AddToClassList("speed-slider");
-                _modeSelector.AddToClassList("animation-mode-dropdown");
+                _modeSelector.AddToClassList("fx-dropdown");
                 _modeSelector.style.flexGrow = 1;
                 modeContainer.Add(_modeSelector);
 

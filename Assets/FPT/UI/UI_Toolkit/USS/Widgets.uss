@@ -1,3 +1,4 @@
+/* ═══ 关节滑块行 ═══ */
 .joint-slider {
     flex-direction: row;
     align-items: center;
@@ -14,9 +15,9 @@
 }
 
 .joint-name {
-    font-size: 15px;
-    color: var(--color-accent);
-    width: 48px;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    width: 44px;
     -unity-font-style: bold;
 }
 
@@ -26,49 +27,50 @@
     margin-right: 6px;
 }
 
+/* ═══ 滑块（浅蓝轨道 + 主蓝手柄） ═══ */
 .unity-base-slider__tracker {
     background-color: rgba(114, 174, 238, 0.38);
     border-width: 1px;
     border-color: rgba(184, 232, 255, 0.46);
     border-radius: 3px;
-    height: 6px;
+    height: 5px;
     margin-top: 0;
     margin-bottom: 0;
 }
 
 .unity-base-slider--horizontal .unity-base-slider__dragger {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 999px;
-    background-color: rgb(25, 103, 206);
+    background-color: var(--color-accent);
     border-width: 1px;
     border-color: rgba(232, 245, 255, 0.86);
-    margin-top: -7px;
+    margin-top: -6px;
 }
 
 .unity-base-slider--horizontal .unity-base-slider__dragger:hover {
-    background-color: rgb(0, 156, 206);
+    background-color: var(--color-accent-dim);
 }
 
 .joint-value-input {
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     color: var(--color-accent);
     -unity-font-style: bold;
-    width: 68px;
-    height: 36px;
+    width: 64px;
+    height: 32px;
 }
 
-/* === 右侧输入框统一样式：浅蓝圆角矩形（关节值 / 末端位姿 / 参考系下拉） === */
+/* ═══ 输入框 / 下拉（暗色抬升面） ═══ */
 .joint-value-input .unity-base-text-field__input,
 .ee-input .unity-base-text-field__input,
 .frame-selector .unity-base-popup-field__input,
 .frame-selector .unity-base-field__input {
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     color: var(--color-accent);
     -unity-font-style: bold;
-    background-color: rgba(216, 235, 255, 0.62);
+    background-color: var(--color-raise);
     border-width: 1px;
-    border-color: var(--color-border);
+    border-color: var(--color-line);
     border-radius: 6px;
     padding-top: 5px;
     padding-bottom: 5px;
@@ -86,13 +88,14 @@
 }
 
 .joint-unit {
-    font-size: var(--font-size);
-    color: var(--color-text-dim);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-faint);
     -unity-font-style: bold;
     width: 14px;
     margin-left: 2px;
 }
 
+/* ═══ 位姿输入分组 ═══ */
 .pose-display {
     flex-direction: row;
 }
@@ -103,15 +106,62 @@
 }
 
 .pose-section-title {
-    font-size: var(--font-size-sm);
-    color: var(--color-accent);
+    font-size: 11px;
+    color: var(--color-accent-dim);
     -unity-font-style: bold;
     margin-bottom: 2px;
 }
 
-.pose-value {
-    font-size: 16px;
+/* ═══ 下拉弹出列表（全局浅蓝，近不透明底） ═══ */
+.unity-base-dropdown__container-outer {
+    background-color: var(--color-popup);
+    border-width: 1px;
+    border-color: var(--color-line);
+    border-radius: 6px;
+}
+
+.unity-base-dropdown__container-inner {
+    background-color: var(--color-popup);
+}
+
+.unity-base-dropdown__item {
+    color: var(--color-text-dim);
+    background-color: transparent;
+    border-width: 0;
+    border-radius: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.unity-base-dropdown__item:hover {
     color: var(--color-accent);
-    margin-left: 4px;
-    padding: 1px 0;
+    background-color: rgba(216, 235, 255, 0.72);
+}
+
+.unity-base-dropdown__item:active {
+    color: rgb(255, 255, 255);
+    background-color: var(--color-accent-dim);
+}
+
+.unity-base-dropdown__checkmark {
+    color: var(--color-accent);
+    -unity-font-style: bold;
+}
+
+/* 弹出列表内的滚动条 */
+.unity-base-dropdown__container-inner .unity-scroller--vertical {
+    background-color: transparent;
+}
+
+.unity-base-dropdown__container-inner .unity-scroller__slider {
+    background-color: rgba(90, 156, 232, 0.46);
+    border-radius: 3px;
+}
+
+.unity-base-dropdown__container-inner .unity-scroller__slider:hover {
+    background-color: var(--color-accent);
 }

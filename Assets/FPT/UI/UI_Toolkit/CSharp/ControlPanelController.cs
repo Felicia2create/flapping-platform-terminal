@@ -23,7 +23,7 @@ namespace FPT.UI
         private readonly DropdownField _frameSelector;
 
         // 操作按钮
-        private readonly Button _confirmBtn, _cancelBtn, _stopBtn;
+        private readonly Button _confirmBtn, _cancelBtn;
         private readonly Label _modeHint, _planStatus;
 
         // 夹爪
@@ -99,7 +99,6 @@ namespace FPT.UI
             // ── 操作按钮 ──
             _confirmBtn = root.Q<Button>("ConfirmButton");
             _cancelBtn = root.Q<Button>("CancelButton");
-            _stopBtn = root.Q<Button>("StopButton");
             _modeHint = root.Q<Label>("ModeHintLabel");
             _planStatus = root.Q<Label>("PlanStatusLabel");
 
@@ -110,8 +109,7 @@ namespace FPT.UI
                 // 恢复 GhostArm 到实时关节角
                 SyncFromRealState();
             };
-            if (_stopBtn != null) _stopBtn.clicked += () =>
-                _armDriver.ExecuteCommand(new StopCommand(_armDriver.DeviceId, true));
+            // 急停已移至顶栏（EstopButton），由 MainViewController 接线
 
             // ── 夹爪（保持不变） ──
             _gripperClose = root.Q<Button>("GripperCloseButton");
@@ -248,8 +246,8 @@ namespace FPT.UI
                 ? "模式: 关节空间"
                 : "模式: 笛卡尔空间";
             _modeHint.style.color = _terminal.ActiveMode == ControlMode.JointSpace
-                ? new StyleColor(new Color(1f, 0.65f, 0.2f))   // 橙色
-                : new StyleColor(new Color(0.3f, 0.65f, 1f));   // 蓝色
+                ? new StyleColor(new Color(1f, 0.65f, 0.2f))   // 橙色（关节空间）
+                : new StyleColor(new Color(0.1f, 0.4f, 0.81f)); // 主蓝（笛卡尔）
         }
 
         // ═══════════════════════════════════════════
