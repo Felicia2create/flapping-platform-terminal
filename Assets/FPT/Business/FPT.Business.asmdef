@@ -5,7 +5,8 @@
         "FPT.Core",
         "FPT.Communication",
         "siemens.ros-sharp.Runtime",
-        "RosMessages.FptInterface"
+        "RosMessages.FptInterface",
+        "RosMessages.SensorInterface"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

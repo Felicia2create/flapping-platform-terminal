@@ -1,0 +1,350 @@
+/* ═══════════════════════════════════════════════════════
+   数据分析页面样式
+   左侧通道面板 + 中间图表区域 + 拖拽反馈
+   ═══════════════════════════════════════════════════════ */
+
+/* ── 左侧通道面板（覆盖 .left-panel 的 overflow: scroll） ── */
+.left-panel.data-channel-panel {
+    width: var(--panel-width);
+    min-width: var(--panel-width);
+    padding: 10px;
+    overflow: hidden;          /* 面板自身不滚动，由内部 ScrollView 负责 */
+    flex-shrink: 0;
+}
+
+/* ── 通道分类折叠组 ── */
+.ch-category {
+    margin-bottom: 6px;
+}
+
+.ch-category-header {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.ch-category-header:hover {
+    background-color: var(--color-accent-ghost);
+    border-radius: 5px;
+}
+
+.ch-category-arrow {
+    font-size: 10px;
+    color: var(--color-text-faint);
+    width: 14px;
+    margin-right: 4px;
+}
+
+.ch-category-title {
+    font-size: 11px;
+    color: var(--color-accent-dim);
+    -unity-font-style: bold;
+    flex-grow: 1;
+}
+
+.ch-category-count {
+    font-size: 10px;
+    color: var(--color-text-faint);
+}
+
+/* ── 通道列表滚动区 ── */
+.ch-list-scroll {
+    flex-grow: 1;              /* 占满中间剩余空间 */
+    flex-shrink: 1;
+    min-height: 0;             /* 关键：允许收缩，否则会撑开父容器 */
+}
+
+/* ── 通道列表 ── */
+.ch-list {
+    flex-direction: column;
+    padding-left: 8px;
+}
+
+/* ── 通道标签（可拖拽） ── */
+.ch-item {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-bottom: 2px;
+    border-radius: 5px;
+    background-color: var(--color-raise);
+    border-width: 1px;
+    border-color: var(--color-line-soft);
+}
+
+.ch-item:hover {
+    background-color: rgba(216, 235, 255, 0.72);
+    border-color: var(--color-accent-dim);
+}
+
+.ch-item:active {
+    background-color: var(--color-accent-ghost);
+    border-color: var(--color-accent);
+}
+
+.ch-item-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    margin-right: 6px;
+}
+
+.ch-item-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    -unity-font-style: bold;
+    flex-grow: 1;
+}
+
+.ch-item-unit {
+    font-size: 10px;
+    color: var(--color-text-faint);
+    margin-left: 4px;
+}
+
+/* 拖拽中的通道标签 */
+.ch-item.dragging {
+    opacity: 0.4;
+}
+
+/* ── 底部操作区（固定在面板底部，不参与滚动） ── */
+.data-actions {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top-width: 1px;
+    border-top-color: var(--color-line-soft);
+    flex-shrink: 0;            /* 不收缩，始终保持自身高度 */
+    flex-grow: 0;              /* 不增长 */
+}
+
+.data-action-btn {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    background-color: var(--color-raise);
+    border-width: 1px;
+    border-color: var(--color-line);
+    border-radius: 6px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 4px;
+    -unity-font-style: bold;
+    flex-grow: 1;
+}
+
+.data-action-btn:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent-dim);
+    background-color: var(--color-accent-ghost);
+}
+
+/* ── 时间窗口控制 ── */
+.data-window-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.data-window-label {
+    font-size: 11px;
+    color: var(--color-text-faint);
+    margin-right: 6px;
+}
+
+/* ═══ 中间图表区域 ═══ */
+.data-chart-area {
+    flex-grow: 1;
+    padding: 4px;
+}
+
+/* ── 单个图表卡片 ── */
+.cz-card {
+    background-color: var(--color-panel);
+    border-width: 1px;
+    border-color: var(--color-line);
+    border-radius: var(--radius);
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-bottom: 8px;
+}
+
+/* 拖拽 hover 高亮 */
+.cz-card.drag-hover {
+    border-color: var(--color-accent);
+    border-width: 2px;
+    background-color: rgba(25, 103, 206, 0.08);
+}
+
+/* ── 图表标题栏 ── */
+.cz-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.cz-title {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-dim);
+    -unity-font-style: bold;
+    flex-grow: 1;
+}
+
+.cz-stats {
+    font-size: 11px;
+    color: var(--color-accent);
+    flex-grow: 2;
+    -unity-text-align: middle-left;
+    margin-left: 12px;
+}
+
+.cz-close-btn {
+    font-size: 14px;
+    color: var(--color-text-faint);
+    background-color: transparent;
+    border-width: 0;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    margin-left: 6px;
+    -unity-font-style: bold;
+}
+
+.cz-close-btn:hover {
+    color: var(--color-danger);
+}
+
+/* ── 图例 ── */
+.cz-legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+    min-height: 18px;
+}
+
+.cz-legend-item {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 10px;
+    margin-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 6px;
+    padding-right: 4px;
+    border-radius: 4px;
+    background-color: var(--color-raise);
+}
+
+.cz-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
+
+.cz-legend-label {
+    font-size: 10px;
+    color: var(--color-text-dim);
+    margin-right: 4px;
+}
+
+.cz-legend-remove {
+    font-size: 12px;
+    color: var(--color-text-faint);
+    background-color: transparent;
+    border-width: 0;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin-left: 2px;
+}
+
+.cz-legend-remove:hover {
+    color: var(--color-danger);
+}
+
+/* ── 绘图区 ── */
+.cz-body {
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.cz-yaxis {
+    width: 40px;
+    justify-content: space-between;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.cz-plot {
+    flex-grow: 1;
+    min-height: 80px;
+}
+
+.cz-xaxis {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 40px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.cz-axis-label {
+    font-size: 10px;
+    color: var(--color-text-faint);
+}
+
+/* ── 空图表提示 ── */
+.cz-empty-hint {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-faint);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ── 新建图表按钮 ── */
+.add-chart-btn {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-faint);
+    background-color: transparent;
+    border-width: 1px;
+    border-color: var(--color-line-soft);
+    border-radius: var(--radius);
+    padding-top: 14px;
+    padding-bottom: 14px;
+    justify-content: center;
+    -unity-font-style: bold;
+}
+
+.add-chart-btn:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent-dim);
+    background-color: var(--color-accent-ghost);
+}
+
+/* ── 拖拽预览（运行时动态创建） ── */
+.drag-preview {
+    position: absolute;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 6px;
+    background-color: var(--color-popup);
+    border-width: 1px;
+    border-color: var(--color-accent);
+    opacity: 0.85;
+    -unity-font-style: bold;
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
+}

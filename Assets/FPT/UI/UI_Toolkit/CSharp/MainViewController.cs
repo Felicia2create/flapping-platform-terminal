@@ -48,7 +48,7 @@ namespace FPT.UI
         private AnimationPageController _animationController;
 
         // 数据分析页面控制器
-        private DataAnalysisPageController _dataAnalysisController;
+        private DataPageController _dataAnalysisController;
 
         // 折叠按钮与面板
         private Button _collapseRightBtn;
@@ -163,7 +163,7 @@ namespace FPT.UI
 
             // ── 数据分析页面 UI 控制器 ──
             if (_dataPage != null)
-                _dataAnalysisController = new DataAnalysisPageController(_dataPage, _ctx.ArmDriver);
+                _dataAnalysisController = new DataPageController(_dataPage, _ctx.SensorDriver);
 
             // ── 折叠按钮 ──
             _collapseRightBtn = _root.Q<Button>("CollapseRightBtn");
@@ -202,9 +202,12 @@ namespace FPT.UI
             // 根据当前页面更新相机交互区域
             if (_dataPage != null && _dataPage.style.display == DisplayStyle.Flex)
             {
-                // 数据分析页面：纯 UI，无 3D 交互
-                _orbitCamera.ActiveArea = Rect.zero;
+                // 数据分析页面：全屏可用，排除左侧面板
+                _orbitCamera.ActiveArea = new Rect(0, 0, Screen.width, Screen.height);
                 _orbitCamera.ExcludeAreas.Clear();
+                var dataLeftPanel = _root.Q("DataLeftPanel");
+                if (dataLeftPanel != null)
+                    _orbitCamera.ExcludeAreas.Add(ToScreenRect(dataLeftPanel));
             }
             else if (_animationPage != null && _animationPage.style.display == DisplayStyle.Flex)
             {
@@ -230,6 +233,9 @@ namespace FPT.UI
             // 控制面板去抖 + 模式提示
             _controlPanel?.UpdateEeDebounce();
             _controlPanel?.UpdateModeHint();
+
+            // 数据页：刷新通道面板（新通道到达时延迟重建）
+            _dataAnalysisController?.Tick();
         }
 
         // ═══════════════════════════════════════════

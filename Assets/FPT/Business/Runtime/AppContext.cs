@@ -16,6 +16,7 @@ namespace FPT.Business
         public DeviceManager DeviceManager { get; private set; }
         public DeviceCoordinator Coordinator { get; private set; }
         public RobotArmDriver ArmDriver { get; private set; }
+        public SensorDriver SensorDriver { get; private set; }
         public AnimationDemoController AnimationDemo { get; private set; }
 
         private void Awake()
@@ -52,6 +53,11 @@ namespace FPT.Business
             ArmDriver = new RobotArmDriver("robot_arm");
             ArmDriver.Bind(Ros2Node);
             DeviceManager.RegisterDriver(ArmDriver);
+
+            // 传感器驱动 — 统一数据采集（关节状态 + 末端位姿 + 未来外部传感器）
+            SensorDriver = new SensorDriver("sensors");
+            SensorDriver.Bind(Ros2Node);
+            DeviceManager.RegisterDriver(SensorDriver);
 
             Coordinator = new DeviceCoordinator(DeviceManager);
             Coordinator.Subscribe();

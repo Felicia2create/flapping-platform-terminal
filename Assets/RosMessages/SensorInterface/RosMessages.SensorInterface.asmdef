@@ -1,0 +1,16 @@
+{
+    "name": "RosMessages.SensorInterface",
+    "rootNamespace": "RosSharp.RosBridgeClient.MessageTypes.SensorInterface",
+    "references": [
+        "siemens.ros-sharp.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

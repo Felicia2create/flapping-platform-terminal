@@ -3,11 +3,9 @@
     <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/TopBar.uss?fileID=7433441132597879392&amp;guid=48d84f32cfd824f40b27e186272c4a9a&amp;type=3#TopBar" />
     <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/Panels.uss?fileID=7433441132597879392&amp;guid=2e1815de5cdd15c458099edf007a7d83&amp;type=3#Panels" />
     <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/Widgets.uss?fileID=7433441132597879392&amp;guid=56ac3c947c94bb944bc7f267981a0dc9&amp;type=3#Widgets" />
+    <Style src="project://database/Assets/FPT/UI/UI_Toolkit/USS/DataPage.uss?fileID=7433441132597879392&amp;guid=bb44647ce1c5482ab59ee8167055dd3e&amp;type=3#DataPage" />
     <ui:VisualElement name="TopBar" class="top-bar">
         <ui:VisualElement name="TopBarLeft" class="top-bar-left">
-            <ui:VisualElement name="AppLogo" class="app-logo">
-                <ui:Label text="F" class="app-logo-text" />
-            </ui:VisualElement>
             <ui:Label name="AppTitle" text="FPT 终端" class="top-bar-title" />
             <ui:VisualElement name="ConnectionPill" class="status-pill disconnected">
                 <ui:VisualElement name="ConnectionIndicator" class="status-dot disconnected" />
@@ -20,19 +18,18 @@
         <ui:VisualElement name="TopBarRight" class="top-bar-right">
             <ui:VisualElement name="NavSegment" class="nav-segment">
                 <ui:Button name="NavControlButton" text="控制面板" class="nav-button nav-active" />
-                <ui:Button name="NavAnimationButton" text="动画演示" class="nav-button" />
                 <ui:Button name="NavDataButton" text="数据分析" class="nav-button" />
+                <ui:Button name="NavAnimationButton" text="动画演示" class="nav-button" />
             </ui:VisualElement>
             <ui:VisualElement name="ModeBadge" class="badge">
                 <ui:VisualElement class="badge-dot" />
                 <ui:Label name="ModeLabel" text="IDLE" class="badge-text" />
             </ui:VisualElement>
             <ui:Label name="FpsLabel" text="FPS --" class="top-bar-fps" style="width: 58px;" />
-            <ui:Button name="EstopButton" text="急停 STOP" class="estop-button" />
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="MainArea" class="main-area">
-        <ui:VisualElement name="ControlPage" class="page-container">
+        <ui:VisualElement name="ControlPage" class="page-container" style="display: flex;">
             <ui:VisualElement name="LeftPanel" class="left-panel">
                 <ui:VisualElement class="panel-header">
                     <ui:Label text="实时数据" class="panel-header-title" />
@@ -115,52 +112,52 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="ControlCenterView" picking-mode="Ignore" class="center-view" />
-            <ui:VisualElement name="RightPanel" class="right-panel">
+            <ui:VisualElement name="RightPanel" class="right-panel" style="width: 300px;">
                 <ui:VisualElement class="panel-header">
                     <ui:Label text="控制面板" class="panel-header-title" />
                     <ui:Label text="CONTROL" class="panel-header-sub" />
                 </ui:VisualElement>
                 <ui:VisualElement class="ee-input-row">
                     <ui:Label text="参考系:" class="ee-label" style="width: 44px; -unity-font-style: bold; color: rgb(25, 103, 206);" />
-                    <ui:DropdownField name="FrameSelector" choices="world,platform_base_link,platform_plate_Link,base_link,link1,link2,link3,link4,link5,link6" index="3" class="frame-selector fx-dropdown" />
+                    <ui:DropdownField name="FrameSelector" choices="world,platform_base_link,platform_plate_Link,base_link,link1,link2,link3,link4,link5,link6" index="3" class="frame-selector fx-dropdown" style="width: 100px;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section">
                     <ui:Label text="关节控制" class="section-title" />
                     <ui:VisualElement name="JointSliderContainer" class="joint-slider-list">
                         <ui:VisualElement class="joint-slider">
                             <ui:Label name="JName0" text="Joint1" class="joint-name" />
-                            <ui:Slider name="JSlider0" low-value="-178" high-value="178" value="0" class="joint-slider-bar" />
-                            <ui:FloatField name="JValue0" value="0" class="joint-value-input" />
+                            <ui:Slider name="JSlider0" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 150px;" />
+                            <ui:FloatField name="JValue0" value="0" class="joint-value-input" style="width: 50px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider">
                             <ui:Label name="JName1" text="Joint2" class="joint-name" />
-                            <ui:Slider name="JSlider1" low-value="-178" high-value="178" value="0" class="joint-slider-bar" />
-                            <ui:FloatField name="JValue1" value="0" class="joint-value-input" />
+                            <ui:Slider name="JSlider1" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 150px;" />
+                            <ui:FloatField name="JValue1" value="0" class="joint-value-input" style="width: 50px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider">
                             <ui:Label name="JName2" text="Joint3" class="joint-name" />
-                            <ui:Slider name="JSlider2" low-value="-178" high-value="145" value="0" class="joint-slider-bar" />
-                            <ui:FloatField name="JValue2" value="0" class="joint-value-input" />
+                            <ui:Slider name="JSlider2" low-value="-178" high-value="145" value="0" class="joint-slider-bar" style="width: 150px;" />
+                            <ui:FloatField name="JValue2" value="0" class="joint-value-input" style="width: 50px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider">
                             <ui:Label name="JName3" text="Joint4" class="joint-name" />
-                            <ui:Slider name="JSlider3" low-value="-178" high-value="178" value="0" class="joint-slider-bar" />
-                            <ui:FloatField name="JValue3" value="0" class="joint-value-input" />
+                            <ui:Slider name="JSlider3" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 150px;" />
+                            <ui:FloatField name="JValue3" value="0" class="joint-value-input" style="width: 50px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider">
                             <ui:Label name="JName4" text="Joint5" class="joint-name" />
-                            <ui:Slider name="JSlider4" low-value="-178" high-value="178" value="0" class="joint-slider-bar" />
-                            <ui:FloatField name="JValue4" value="0" class="joint-value-input" />
+                            <ui:Slider name="JSlider4" low-value="-178" high-value="178" value="0" class="joint-slider-bar" style="width: 150px;" />
+                            <ui:FloatField name="JValue4" value="0" class="joint-value-input" style="width: 50px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                         <ui:VisualElement class="joint-slider">
                             <ui:Label name="JName5" text="Joint6" class="joint-name" />
-                            <ui:Slider name="JSlider5" low-value="-180" high-value="180" value="0" class="joint-slider-bar" />
-                            <ui:FloatField name="JValue5" value="0" class="joint-value-input" />
+                            <ui:Slider name="JSlider5" low-value="-180" high-value="180" value="0" class="joint-slider-bar" style="width: 150px;" />
+                            <ui:FloatField name="JValue5" value="0" class="joint-value-input" style="width: 50px;" />
                             <ui:Label text="°" class="joint-unit" />
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -208,6 +205,7 @@
                         <ui:Button name="ConfirmButton" text="确认执行" class="confirm-button" />
                         <ui:Button name="CancelButton" text="取消" class="cancel-button" />
                     </ui:VisualElement>
+                    <ui:Button name="EstopButton" text="急停 STOP" class="estop-button" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
@@ -229,20 +227,20 @@
                 <ui:VisualElement class="control-section">
                     <ui:Label text="基础速度" class="section-title" />
                     <ui:VisualElement class="speed-row">
-                        <ui:Slider name="SpeedSlider" low-value="0.1" high-value="5" value="1" class="speed-slider" />
+                        <ui:Slider name="SpeedSlider" low-value="0.1" high-value="5" value="1" class="speed-slider" style="width: 100px;" />
                         <ui:Label name="SpeedValueLabel" text="1.0x" class="speed-value" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section">
                     <ui:Label text="动作幅度" class="section-title" />
                     <ui:VisualElement class="speed-row">
-                        <ui:Slider name="AmplitudeSlider" low-value="0.01" high-value="1.5" value="0.3" class="speed-slider" />
+                        <ui:Slider name="AmplitudeSlider" low-value="0.01" high-value="1.5" value="0.3" class="speed-slider" style="width: 100px;" />
                         <ui:Label name="AmplitudeValueLabel" text="0.30 rad" class="speed-value" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="control-section">
                     <ui:Label text="基础频率" class="section-title" />
-                    <ui:VisualElement class="speed-row">
+                    <ui:VisualElement class="speed-row" style="width: 180px;">
                         <ui:Slider name="FrequencySlider" low-value="0.1" high-value="3" value="0.5" class="speed-slider" />
                         <ui:Label name="FrequencyValueLabel" text="0.50 Hz" class="speed-value" />
                     </ui:VisualElement>
@@ -250,7 +248,7 @@
                 <ui:VisualElement class="control-section">
                     <ui:Label text="转台转速" class="section-title" />
                     <ui:VisualElement class="speed-row">
-                        <ui:Slider name="PlateSpeedSlider" low-value="0" high-value="90" value="0" class="speed-slider" />
+                        <ui:Slider name="PlateSpeedSlider" low-value="0" high-value="90" value="0" class="speed-slider" style="width: 100px;" />
                         <ui:Label name="PlateSpeedValueLabel" text="0°/s" class="speed-value" />
                     </ui:VisualElement>
                 </ui:VisualElement>
@@ -343,69 +341,23 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="DataPage" class="page-container" style="display: none;">
-            <ui:VisualElement name="DataLeftPanel" class="left-panel">
+            <ui:VisualElement name="DataLeftPanel" class="left-panel data-channel-panel">
                 <ui:VisualElement class="panel-header">
-                    <ui:Label text="数据分析" class="panel-header-title" />
-                    <ui:Label text="DATA ANALYSIS" class="panel-header-sub" />
+                    <ui:Label text="数据通道" class="panel-header-title" />
+                    <ui:Label text="CHANNELS" class="panel-header-sub" />
                 </ui:VisualElement>
-                <ui:VisualElement class="control-section">
-                    <ui:Label text="数据通道（纵坐标）" class="section-title" />
-                    <ui:VisualElement name="DaChannelContainer" class="speed-row" />
-                </ui:VisualElement>
-                <ui:VisualElement class="control-section">
-                    <ui:Label text="时间窗口（横坐标）" class="section-title" />
-                    <ui:VisualElement name="DaWindowContainer" class="speed-row" />
-                </ui:VisualElement>
-                <ui:VisualElement class="control-section">
-                    <ui:Label text="统计" class="section-title" />
-                    <ui:VisualElement class="joint-list">
-                        <ui:VisualElement class="data-row">
-                            <ui:Label text="当前值" class="data-row-label" />
-                            <ui:Label name="DaStatCurrent" text="--" class="data-row-value" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="data-row">
-                            <ui:Label text="最大值" class="data-row-label" />
-                            <ui:Label name="DaStatMax" text="--" class="data-row-value" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="data-row">
-                            <ui:Label text="最小值" class="data-row-label" />
-                            <ui:Label name="DaStatMin" text="--" class="data-row-value" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="data-row">
-                            <ui:Label text="样本数" class="data-row-label" />
-                            <ui:Label name="DaStatCount" text="0" class="data-row-value" />
-                        </ui:VisualElement>
+                <ui:ScrollView name="ChannelListScrollView" class="ch-list-scroll" />
+                <ui:VisualElement name="DataActions" class="data-actions">
+                    <ui:VisualElement class="data-window-row">
+                        <ui:Label text="时间窗口" class="data-window-label" />
+                        <ui:VisualElement name="DaWindowContainer" class="speed-row" style="flex-grow: 1;" />
                     </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement class="control-section">
-                    <ui:Label text="操作" class="section-title" />
-                    <ui:VisualElement class="button-row">
-                        <ui:Button name="DaPauseButton" text="⏸ 暂停" class="cancel-button" />
-                        <ui:Button name="DaClearButton" text="清除数据" class="cancel-button" />
-                    </ui:VisualElement>
+                    <ui:Button name="AddChartButton" text="＋ 新建图表" class="data-action-btn" />
+                    <ui:Button name="DaPauseButton" text="⏸ 暂停全部" class="data-action-btn" />
+                    <ui:Button name="DaClearButton" text="🗑 清除全部" class="data-action-btn" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="DataCenterView" class="data-center">
-                <ui:VisualElement class="chart-card data-chart-card">
-                    <ui:VisualElement class="chart-head">
-                        <ui:Label name="DaChartTitle" text="--" class="chart-title" />
-                        <ui:Label name="DaChartValue" text="暂无数据" class="chart-value" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="data-chart-body">
-                        <ui:VisualElement class="data-yaxis">
-                            <ui:Label name="DaYMax" text="--" class="data-axis-label" />
-                            <ui:Label name="DaYMid" text="--" class="data-axis-label" />
-                            <ui:Label name="DaYMin" text="--" class="data-axis-label" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="DaChartPlot" class="data-chart-plot" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="data-xaxis">
-                        <ui:Label name="DaXT0" text="-60s" class="data-axis-label" />
-                        <ui:Label name="DaXT1" text="-30s" class="data-axis-label" />
-                        <ui:Label text="现在" class="data-axis-label" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
+            <ui:ScrollView name="DataChartArea" class="data-chart-area" />
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="StatusBar" class="status-bar">
